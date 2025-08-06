@@ -3,15 +3,11 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import AppCardCarousel from "@/components/AppCardCarousel";
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
-import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection"; // Import the HeroSection
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-      {/* Header Section */}
-      <Header />
-
       {/* Hero Section */}
       <HeroSection />
 
