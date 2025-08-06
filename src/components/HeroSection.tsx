@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
               View Projects
             </a>
           </Button>
-          <Button asChild variant="outline" className="px-6 py-3 border border-white text-white rounded-full font-semibold hover:bg-white hover:text-blue-700 transition-colors shadow-lg">
+          <Button asChild className="px-6 py-3 bg-white text-blue-700 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg">
             <a href="#blog">
               Read Blog
             </a>
