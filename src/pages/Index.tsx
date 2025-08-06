@@ -2,7 +2,7 @@
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import AppCardCarousel from "@/components/AppCardCarousel";
-import BlogFeed from "@/components/BlogFeed";
+import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget"; // Import the new component
 
 const Index = () => {
   return (
@@ -34,7 +34,7 @@ const Index = () => {
 
       {/* Blog Section */}
       <div id="blog">
-        <BlogFeed />
+        <CommonNinjaBlogWidget /> {/* Use the new component here */}
       </div>
 
       <MadeWithDyad />
