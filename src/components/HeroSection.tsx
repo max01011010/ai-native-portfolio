@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 interface Ripple {
@@ -11,40 +11,39 @@ interface Ripple {
   scale: number;
 }
 
+const MIN_RIPPLE_DISTANCE = 10; // Minimum distance in pixels between ripples
+const RIPPLE_CREATION_INTERVAL = 50; // milliseconds between each new ripple (can be adjusted)
+
 const HeroSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleIdCounter = useRef(0);
-  const lastRippleTime = useRef(0); // To control the frequency of new ripples
-  const RIPPLE_CREATION_INTERVAL = 100; // milliseconds between each new ripple
-
-  // Update container dimensions on resize
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (sectionRef.current) {
-        // No need to set container dimensions if not used for ripple positioning logic
-      }
-    };
-    // No need for resize listener if container dimensions are not used for ripple positioning
-    // window.addEventListener('resize', updateDimensions);
-    // return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
+  const lastRipplePosition = useRef<{ x: number; y: number } | null>(null);
+  const lastRippleTime = useRef(0);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const now = Date.now();
-    // Only create a new ripple if enough time has passed since the last one
-    if (now - lastRippleTime.current < RIPPLE_CREATION_INTERVAL) {
-      return;
-    }
 
     if (sectionRef.current) {
       const rect = sectionRef.current.getBoundingClientRect();
-      
-      // Get mouse position relative to the section
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      // Create ripple at the exact mouse position
+      // Check time interval to prevent too many ripples on very fast movements
+      if (now - lastRippleTime.current < RIPPLE_CREATION_INTERVAL) {
+        return;
+      }
+
+      // Check distance from last created ripple
+      if (lastRipplePosition.current) {
+        const dx = mouseX - lastRipplePosition.current.x;
+        const dy = mouseY - lastRipplePosition.current.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < MIN_RIPPLE_DISTANCE) {
+          return;
+        }
+      }
+
       const newRipple: Ripple = {
         id: rippleIdCounter.current++,
         x: mouseX,
@@ -55,10 +54,11 @@ const HeroSection: React.FC = () => {
 
       setRipples((prevRipples) => {
         const updatedRipples = [...prevRipples, newRipple];
-        return updatedRipples.slice(-500); // Keep last 500 ripples for a long trail
+        return updatedRipples.slice(-6); // Keep only the last 6 ripples
       });
 
-      lastRippleTime.current = now; // Update the time of the last created ripple
+      lastRipplePosition.current = { x: mouseX, y: mouseY };
+      lastRippleTime.current = now;
 
       // Animate and remove ripple
       setTimeout(() => {
