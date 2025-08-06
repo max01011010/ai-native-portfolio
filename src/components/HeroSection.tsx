@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import AsciiFish from "./AsciiFish"; // Import the new component
 
 interface Ripple {
   id: number;
@@ -12,21 +11,10 @@ interface Ripple {
   scale: number;
 }
 
-interface FishData {
-  id: number;
-  x: number;
-  y: number;
-  direction: 'left' | 'right';
-  speed: number;
-  art: string;
-}
-
 const HeroSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Ripple[]>([]);
-  const [fish, setFish] = useState<FishData[]>([]);
   const rippleIdCounter = useRef(0);
-  const fishIdCounter = useRef(0);
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
 
   // Update container dimensions on resize
@@ -60,7 +48,7 @@ const HeroSection: React.FC = () => {
 
       setRipples((prevRipples) => {
         const updatedRipples = [...prevRipples, newRipple];
-        return updatedRipples.slice(-10); // Keep last 10 ripples for performance
+        return updatedRipples.slice(-15); // Keep last 15 ripples for performance
       });
 
       // Animate and remove ripple
@@ -74,36 +62,10 @@ const HeroSection: React.FC = () => {
           setRipples((prevRipples) =>
             prevRipples.filter((r) => r.id !== newRipple.id)
           );
-        }, 700); // Match CSS transition duration
+        }, 1500); // Match CSS transition duration (1.5s)
       }, 50); // Small delay to allow initial render before animation starts
     }
   };
-
-  const removeFish = useCallback((id: number) => {
-    setFish(prevFish => prevFish.filter(f => f.id !== id));
-  }, []);
-
-  useEffect(() => {
-    if (containerDimensions.width === 0 || containerDimensions.height === 0) return;
-
-    const addFishInterval = setInterval(() => {
-      if (fish.length < 3) { // Limit number of fish to 3
-        const direction = Math.random() > 0.5 ? 'right' : 'left';
-        const art = direction === 'right' ? "><>" : "<><"; // Simple ASCII fish art
-        const newFish: FishData = {
-          id: fishIdCounter.current++,
-          x: direction === 'right' ? -50 : containerDimensions.width + 50, // Start off-screen
-          y: Math.random() * containerDimensions.height,
-          direction,
-          speed: Math.random() * 1.5 + 0.5, // Increased speed range (0.5 to 2.0 pixels/frame)
-          art,
-        };
-        setFish(prevFish => [...prevFish, newFish]);
-      }
-    }, 15000); // Add a new fish every 15 seconds
-
-    return () => clearInterval(addFishInterval);
-  }, [fish.length, containerDimensions]);
 
   return (
     <section
@@ -117,26 +79,15 @@ const HeroSection: React.FC = () => {
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
-          className="absolute bg-white rounded-full opacity-0 transition-all duration-700 ease-out"
+          className="absolute bg-white rounded-full opacity-0 transition-all duration-[1500ms] ease-out" // Increased duration
           style={{
             left: `${ripple.x}px`,
             top: `${ripple.y}px`,
-            width: '20px', // Initial size
-            height: '20px',
+            width: '40px', // Increased initial size
+            height: '40px',
             transform: `translate(-50%, -50%) scale(${ripple.scale})`,
             opacity: ripple.opacity,
           }}
-        />
-      ))}
-
-      {/* Fish */}
-      {fish.map((f) => (
-        <AsciiFish
-          key={f.id}
-          {...f}
-          containerWidth={containerDimensions.width}
-          containerHeight={containerDimensions.height}
-          onRemove={removeFish}
         />
       ))}
 
