@@ -21,13 +21,11 @@ const BlogFeed: React.FC = () => {
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
-        // Public CORS proxy
-        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-        // Updated Blogger Atom feed URL
+        // Local proxy endpoint (will be deployed as a serverless function)
         const feedUrl = "https://freedbydesign.blogspot.com/feeds/posts/default?alt=atom";
+        const proxyUrl = `/api/proxy?url=${encodeURIComponent(feedUrl)}`;
         
-        // Combine proxy URL with the actual feed URL
-        const response = await fetch(proxyUrl + feedUrl);
+        const response = await fetch(proxyUrl);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -60,7 +58,7 @@ const BlogFeed: React.FC = () => {
         setPosts(fetchedPosts.slice(0, 3)); // Displaying up to 3 recent posts
       } catch (e: any) {
         console.error("Failed to fetch blog posts:", e);
-        setError("Failed to load blog posts. This might be due to CORS restrictions or network issues. If using a public proxy, it might be rate-limited or down.");
+        setError("Failed to load blog posts. This might be due to CORS restrictions or network issues. Please ensure your application is deployed to a platform that supports serverless functions (like Vercel or Netlify) for the proxy to work correctly.");
       } finally {
         setLoading(false);
       }
