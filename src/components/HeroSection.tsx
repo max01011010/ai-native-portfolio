@@ -35,13 +35,19 @@ const HeroSection: React.FC = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     if (sectionRef.current) {
       const rect = sectionRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      
+      // Get mouse position relative to the section
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      // Add a random offset to the ripple's position
+      const offsetX = (Math.random() - 0.5) * 100; // -50 to +50 pixels
+      const offsetY = (Math.random() - 0.5) * 100; // -50 to +50 pixels
 
       const newRipple: Ripple = {
         id: rippleIdCounter.current++,
-        x,
-        y,
+        x: mouseX + offsetX,
+        y: mouseY + offsetY,
         opacity: 1,
         scale: 0,
       };
@@ -62,7 +68,7 @@ const HeroSection: React.FC = () => {
           setRipples((prevRipples) =>
             prevRipples.filter((r) => r.id !== newRipple.id)
           );
-        }, 1500); // Match CSS transition duration (1.5s)
+        }, 7000); // Match CSS transition duration (7s)
       }, 50); // Small delay to allow initial render before animation starts
     }
   };
@@ -79,11 +85,11 @@ const HeroSection: React.FC = () => {
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
-          className="absolute bg-white rounded-full opacity-0 transition-all duration-[1500ms] ease-out" // Increased duration
+          className="absolute bg-white rounded-full opacity-0 transition-all duration-[7000ms] ease-out" // Increased duration to 7 seconds
           style={{
             left: `${ripple.x}px`,
             top: `${ripple.y}px`,
-            width: '40px', // Increased initial size
+            width: '40px', // Initial size
             height: '40px',
             transform: `translate(-50%, -50%) scale(${ripple.scale})`,
             opacity: ripple.opacity,
