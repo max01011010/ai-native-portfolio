@@ -18,36 +18,24 @@ interface AppCardProps {
   description: string;
   imageUrl: string;
   link: string;
+  isComingSoon?: boolean;
 }
 
 const appData: AppCardProps[] = [
   {
     id: "1",
-    title: "Project Alpha",
-    description: "A groundbreaking application designed to streamline daily tasks and boost productivity.",
+    title: "Bit - AI Powered Habit Tracker",
+    description: "An AI-powered habit tracker designed to help you build and maintain positive habits effortlessly.",
     imageUrl: "/placeholder.svg", // Using a placeholder image
-    link: "#",
+    link: "https://bits-eta.vercel.app/",
   },
   {
     id: "2",
-    title: "Project Beta",
-    description: "An innovative platform for connecting users with local services and community events.",
+    title: "Shelter Availability Map",
+    description: "A map showing real-time shelter availability. Launching in September!",
     imageUrl: "/placeholder.svg",
     link: "#",
-  },
-  {
-    id: "3",
-    title: "Project Gamma",
-    description: "A creative tool for artists and designers to bring their digital visions to life.",
-    imageUrl: "/placeholder.svg",
-    link: "#",
-  },
-  {
-    id: "4",
-    title: "Project Delta",
-    description: "An educational app making complex subjects easy to understand through interactive lessons.",
-    imageUrl: "/placeholder.svg",
-    link: "#",
+    isComingSoon: true,
   },
 ];
 
@@ -74,10 +62,14 @@ const AppCardCarousel: React.FC = () => {
                     </CardHeader>
                     <CardContent className="flex-grow"></CardContent>
                     <CardFooter>
-                      <Button asChild className="w-full">
-                        <a href={app.link} target="_blank" rel="noopener noreferrer">
-                          View Project <ExternalLink className="ml-2 h-4 w-4" />
-                        </a>
+                      <Button asChild className="w-full" disabled={app.isComingSoon}>
+                        {app.isComingSoon ? (
+                          <span>Coming Soon!</span>
+                        ) : (
+                          <a href={app.link} target="_blank" rel="noopener noreferrer">
+                            View Project <ExternalLink className="ml-2 h-4 w-4" />
+                          </a>
+                        )}
                       </Button>
                     </CardFooter>
                   </Card>
