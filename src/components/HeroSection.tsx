@@ -87,7 +87,7 @@ const HeroSection: React.FC = () => {
     if (containerDimensions.width === 0 || containerDimensions.height === 0) return;
 
     const addFishInterval = setInterval(() => {
-      if (fish.length < 5) { // Limit number of fish to 5
+      if (fish.length < 3) { // Limit number of fish to 3
         const direction = Math.random() > 0.5 ? 'right' : 'left';
         const art = direction === 'right' ? "><>" : "<><"; // Simple ASCII fish art
         const newFish: FishData = {
@@ -95,12 +95,12 @@ const HeroSection: React.FC = () => {
           x: direction === 'right' ? -50 : containerDimensions.width + 50, // Start off-screen
           y: Math.random() * containerDimensions.height,
           direction,
-          speed: Math.random() * 0.5 + 0.2, // Random speed
+          speed: Math.random() * 1.5 + 0.5, // Increased speed range (0.5 to 2.0 pixels/frame)
           art,
         };
         setFish(prevFish => [...prevFish, newFish]);
       }
-    }, 3000); // Add a new fish every 3 seconds
+    }, 15000); // Add a new fish every 15 seconds
 
     return () => clearInterval(addFishInterval);
   }, [fish.length, containerDimensions]);

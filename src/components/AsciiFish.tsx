@@ -60,7 +60,7 @@ const AsciiFish: React.FC<AsciiFishProps> = ({
   return (
     <pre
       ref={fishRef}
-      className="absolute text-white text-sm md:text-base lg:text-lg pointer-events-none whitespace-pre"
+      className="absolute text-white text-sm md:text-base lg:text-lg pointer-events-none whitespace-pre z-20" // Added z-20
       style={{
         left: `${currentX}px`,
         top: `${currentY}px`,
