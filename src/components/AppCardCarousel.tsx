@@ -26,7 +26,7 @@ const appData: AppCardProps[] = [
     id: "1",
     title: "Bit - AI Powered Habit Tracker",
     description: "An AI-powered habit tracker designed to help you build and maintain positive habits effortlessly.",
-    imageUrl: "/placeholder.svg", // Using a placeholder image
+    imageUrl: "/achievements.png", // Updated to use the new image
     link: "https://bits-eta.vercel.app/",
   },
   {
