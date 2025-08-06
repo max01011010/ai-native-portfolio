@@ -29,6 +29,8 @@ const AsciiFish: React.FC<AsciiFishProps> = ({
   const [currentY, setCurrentY] = useState(initialY);
   const animationRef = useRef<number>();
   const fishRef = useRef<HTMLPreElement>(null);
+  const verticalDirectionRef = useRef(Math.random() > 0.5 ? 1 : -1); // 1 for down, -1 for up
+  const verticalSpeed = 0.2; // Small vertical movement speed
 
   const animate = () => {
     setCurrentX((prevX) => {
@@ -45,6 +47,19 @@ const AsciiFish: React.FC<AsciiFishProps> = ({
       }
       return newX;
     });
+
+    setCurrentY((prevY) => {
+      let newY = prevY + verticalDirectionRef.current * verticalSpeed;
+      const fishHeight = fishRef.current?.offsetHeight || 20; // Estimate fish height
+
+      // Reverse vertical direction if hitting top or bottom
+      if (newY < 0 || newY > containerHeight - fishHeight) {
+        verticalDirectionRef.current *= -1;
+        newY = prevY + verticalDirectionRef.current * verticalSpeed; // Re-calculate with new direction
+      }
+      return newY;
+    });
+
     animationRef.current = requestAnimationFrame(animate);
   };
 
@@ -55,12 +70,12 @@ const AsciiFish: React.FC<AsciiFishProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [direction, speed, containerWidth, onRemove, id]);
+  }, [direction, speed, containerWidth, containerHeight, onRemove, id]); // Added containerHeight to dependencies
 
   return (
     <pre
       ref={fishRef}
-      className="absolute text-white text-sm md:text-base lg:text-lg pointer-events-none whitespace-pre z-20" // Added z-20
+      className="absolute text-white text-sm md:text-base lg:text-lg pointer-events-none whitespace-pre z-20"
       style={{
         left: `${currentX}px`,
         top: `${currentY}px`,
