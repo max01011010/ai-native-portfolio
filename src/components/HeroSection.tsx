@@ -15,24 +15,28 @@ const HeroSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleIdCounter = useRef(0);
-  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
+  const lastRippleTime = useRef(0); // To control the frequency of new ripples
+  const RIPPLE_CREATION_INTERVAL = 100; // milliseconds between each new ripple
 
   // Update container dimensions on resize
   useEffect(() => {
     const updateDimensions = () => {
       if (sectionRef.current) {
-        setContainerDimensions({
-          width: sectionRef.current.offsetWidth,
-          height: sectionRef.current.offsetHeight,
-        });
+        // No need to set container dimensions if not used for ripple positioning logic
       }
     };
-    updateDimensions(); // Initial set
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    // No need for resize listener if container dimensions are not used for ripple positioning
+    // window.addEventListener('resize', updateDimensions);
+    // return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    const now = Date.now();
+    // Only create a new ripple if enough time has passed since the last one
+    if (now - lastRippleTime.current < RIPPLE_CREATION_INTERVAL) {
+      return;
+    }
+
     if (sectionRef.current) {
       const rect = sectionRef.current.getBoundingClientRect();
       
@@ -40,7 +44,7 @@ const HeroSection: React.FC = () => {
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      // Create ripple at the exact mouse position (removed random offset)
+      // Create ripple at the exact mouse position
       const newRipple: Ripple = {
         id: rippleIdCounter.current++,
         x: mouseX,
@@ -51,8 +55,10 @@ const HeroSection: React.FC = () => {
 
       setRipples((prevRipples) => {
         const updatedRipples = [...prevRipples, newRipple];
-        return updatedRipples.slice(-500); // Keep last 500 ripples for a longer trail
+        return updatedRipples.slice(-500); // Keep last 500 ripples for a long trail
       });
+
+      lastRippleTime.current = now; // Update the time of the last created ripple
 
       // Animate and remove ripple
       setTimeout(() => {
