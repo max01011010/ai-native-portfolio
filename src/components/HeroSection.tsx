@@ -29,7 +29,7 @@ const HeroSection: React.FC = () => {
     };
     updateDimensions(); // Initial set
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('change', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -40,14 +40,11 @@ const HeroSection: React.FC = () => {
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      // Add a random offset to the ripple's position
-      const offsetX = (Math.random() - 0.5) * 100; // -50 to +50 pixels
-      const offsetY = (Math.random() - 0.5) * 100; // -50 to +50 pixels
-
+      // Create ripple at the exact mouse position (removed random offset)
       const newRipple: Ripple = {
         id: rippleIdCounter.current++,
-        x: mouseX + offsetX,
-        y: mouseY + offsetY,
+        x: mouseX,
+        y: mouseY,
         opacity: 1,
         scale: 0,
       };
@@ -85,7 +82,7 @@ const HeroSection: React.FC = () => {
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
-          className="absolute bg-white rounded-full opacity-0 transition-all duration-[25000ms] ease-out" // Increased duration to 25 seconds
+          className="absolute bg-white rounded-full opacity-0 transition-all duration-[25000ms] ease-out" // Duration is 25 seconds
           style={{
             left: `${ripple.x}px`,
             top: `${ripple.y}px`,
