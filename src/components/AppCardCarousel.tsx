@@ -33,7 +33,7 @@ const appData: AppCardProps[] = [
     id: "2",
     title: "Shelter Availability Map",
     description: "A map showing real-time shelter availability. Launching in September!",
-    imageUrl: "/shelterconnect.png", // Updated to use the new image
+    imageUrl: "/mappreview.png", // Updated to use the new image
     link: "#",
     isComingSoon: true,
   },
