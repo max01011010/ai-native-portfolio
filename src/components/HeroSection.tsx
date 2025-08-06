@@ -29,7 +29,7 @@ const HeroSection: React.FC = () => {
     };
     updateDimensions(); // Initial set
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('change', updateDimensions);
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -54,7 +54,7 @@ const HeroSection: React.FC = () => {
 
       setRipples((prevRipples) => {
         const updatedRipples = [...prevRipples, newRipple];
-        return updatedRipples.slice(-15); // Keep last 15 ripples for performance
+        return updatedRipples.slice(-500); // Keep last 500 ripples for a longer trail
       });
 
       // Animate and remove ripple
@@ -68,7 +68,7 @@ const HeroSection: React.FC = () => {
           setRipples((prevRipples) =>
             prevRipples.filter((r) => r.id !== newRipple.id)
           );
-        }, 7000); // Match CSS transition duration (7s)
+        }, 25000); // Match CSS transition duration (25s)
       }, 50); // Small delay to allow initial render before animation starts
     }
   };
@@ -85,7 +85,7 @@ const HeroSection: React.FC = () => {
       {ripples.map((ripple) => (
         <div
           key={ripple.id}
-          className="absolute bg-white rounded-full opacity-0 transition-all duration-[7000ms] ease-out" // Increased duration to 7 seconds
+          className="absolute bg-white rounded-full opacity-0 transition-all duration-[25000ms] ease-out" // Increased duration to 25 seconds
           style={{
             left: `${ripple.x}px`,
             top: `${ripple.y}px`,
