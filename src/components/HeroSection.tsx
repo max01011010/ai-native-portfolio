@@ -17,7 +17,7 @@ const NUM_PARTICLES = 80; // Number of particles
 const PARTICLE_RADIUS = 1.5; // Base radius for particles
 const MAX_LINE_DISTANCE = 120; // Max distance for particles to connect
 const MOUSE_INTERACTION_RADIUS = 150; // Radius around mouse for interaction
-const MOUSE_REPULSION_FORCE = 0.05; // How strongly particles are repelled
+const MOUSE_ATTRACTION_FORCE = 0.005; // How strongly particles are attracted (reduced for subtlety)
 const PARTICLE_SPEED = 0.2; // Base speed for particles
 
 const HeroSection: React.FC = () => {
@@ -65,17 +65,27 @@ const HeroSection: React.FC = () => {
         p.vy *= -1;
       }
 
-      // Mouse interaction: repel particles
+      // Mouse interaction: attract particles
       if (mouse.current.x !== null && mouse.current.y !== null) {
-        const dx = p.x - mouse.current.x;
-        const dy = p.y - mouse.current.y;
+        const dx = mouse.current.x - p.x; // Distance from particle to mouse
+        const dy = mouse.current.y - p.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < MOUSE_INTERACTION_RADIUS) {
-          const angle = Math.atan2(dy, dx);
-          const force = (MOUSE_INTERACTION_RADIUS - distance) / MOUSE_INTERACTION_RADIUS;
-          p.vx += Math.cos(angle) * force * MOUSE_REPULSION_FORCE;
-          p.vy += Math.sin(angle) * force * MOUSE_REPULSION_FORCE;
+          // Normalize direction vector
+          const nx = dx / distance;
+          const ny = dy / distance;
+
+          // Calculate attraction force strength (stronger closer to mouse)
+          const forceStrength = (1 - distance / MOUSE_INTERACTION_RADIUS) * MOUSE_ATTRACTION_FORCE;
+
+          // Apply force to velocity
+          p.vx += nx * forceStrength;
+          p.vy += ny * forceStrength;
+
+          // Add some damping to prevent excessive speed
+          p.vx *= 0.98;
+          p.vy *= 0.98;
         }
       }
 
