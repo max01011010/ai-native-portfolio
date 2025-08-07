@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AI Native Dev Folio</string>
+    <string name="title_activity_main">AI Native Dev Folio</string>
+    <string name="package_name">com.example.ainativedevfolio</string>
+    <string name="custom_url_scheme">com.example.ainativedevfolio</string>
+</resources>
