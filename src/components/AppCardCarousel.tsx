@@ -45,6 +45,14 @@ const appData: AppCardProps[] = [
     link: "#",
     isComingSoon: true,
   },
+  {
+    id: "4",
+    title: "JobRewrite",
+    description: "A free webapp that allows users to rewrite their role responsibility or job history entry from their resume to make an ATS compliant and results-oriented revision.",
+    imageUrl: "/placeholder.svg", // Using a generic placeholder for now
+    link: "#",
+    isComingSoon: true,
+  },
 ];
 
 const AppCardCarousel: React.FC = () => {
