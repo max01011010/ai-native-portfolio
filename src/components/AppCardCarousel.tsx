@@ -30,6 +30,14 @@ const appData: AppCardProps[] = [
     link: "https://bits-eta.vercel.app/",
   },
   {
+    id: "4",
+    title: "JobRewrite",
+    description: "A free webapp that allows users to rewrite their role responsibility or job history entry from their resume to make an ATS compliant and results-oriented revision.",
+    imageUrl: "/placeholder.svg", // Using a generic placeholder for now
+    link: "https://jobrewrite.vercel.app/",
+    isComingSoon: false,
+  },
+  {
     id: "2",
     title: "Shelter Connect",
     description: "A map showing real-time shelter availability. Launching in September!",
@@ -41,14 +49,6 @@ const appData: AppCardProps[] = [
     id: "3",
     title: "Practicum",
     description: "AI supported and adaptive language learning app. Under development.",
-    imageUrl: "/placeholder.svg", // Using a generic placeholder for now
-    link: "#",
-    isComingSoon: true,
-  },
-  {
-    id: "4",
-    title: "JobRewrite",
-    description: "A free webapp that allows users to rewrite their role responsibility or job history entry from their resume to make an ATS compliant and results-oriented revision.",
     imageUrl: "/placeholder.svg", // Using a generic placeholder for now
     link: "#",
     isComingSoon: true,
