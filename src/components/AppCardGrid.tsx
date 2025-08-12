@@ -17,7 +17,7 @@ interface AppCardProps {
 const appData: AppCardProps[] = [
   {
     id: "1",
-    title: "Bit - AI Powered Habit Tracker",
+    title: "Bit - AI Powered Habits",
     description: "An AI-powered habit tracker designed to help you build and maintain positive habits effortlessly.",
     imageUrl: "/Placeholder1Zoomed.png",
     link: "https://bits-eta.vercel.app/",
