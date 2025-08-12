@@ -32,8 +32,8 @@ const appData: AppCardProps[] = [
   {
     id: "4",
     title: "JobRewrite",
-    description: "A free webapp that allows users to rewrite their role responsibility or job history entry from their resume to make an ATS compliant and results-oriented revision.",
-    imageUrl: "/placeholder.svg", // Using a generic placeholder for now
+    description: "AI powered tool to rewrite resume entries to be ATS-compliant and results-oriented.",
+    imageUrl: "/JobRewrite.png",
     link: "https://jobrewrite.vercel.app/",
     isComingSoon: false,
   },
