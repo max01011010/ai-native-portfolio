@@ -1,9 +1,9 @@
 "use client";
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import AppCardCarousel from "@/components/AppCardCarousel";
+import AppCardGrid from "@/components/AppCardGrid"; // Updated import
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
-import HeroSection from "@/components/HeroSection"; // Import the HeroSection
+import HeroSection from "@/components/HeroSection";
 
 const Index = () => {
   return (
@@ -13,7 +13,7 @@ const Index = () => {
 
       {/* Projects Section */}
       <div id="projects">
-        <AppCardCarousel />
+        <AppCardGrid /> {/* Updated component name */}
       </div>
 
       {/* Blog Section */}
