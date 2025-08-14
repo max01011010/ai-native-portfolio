@@ -1,10 +1,10 @@
 "use client";
 
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import AppCardGrid from "@/components/AppCardGrid";
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
 import HeroSection from "@/components/HeroSection";
-import KoFiWidget from "@/components/KoFiWidget"; // Import the new KoFiWidget
+import KoFiWidget from "@/components/KoFiWidget";
+import Footer from "@/components/Footer"; // Import the new Footer component
 
 const Index = () => {
   return (
@@ -25,7 +25,8 @@ const Index = () => {
       {/* Ko-fi Widget */}
       <KoFiWidget />
 
-      <MadeWithDyad />
+      {/* Footer Section */}
+      <Footer />
     </div>
   );
 };
