@@ -23,6 +23,13 @@ const Footer: React.FC = () => {
           >
             Terms and Conditions
           </Link>
+          <span className="hidden md:inline-block">|</span>
+          <Link
+            to="/privacy-policy"
+            className="text-sm hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          >
+            Privacy Policy
+          </Link>
         </div>
         <p className="mt-4 text-sm">&copy; {new Date().getFullYear()} Max's Dev Portfolio. All rights reserved.</p>
       </div>
