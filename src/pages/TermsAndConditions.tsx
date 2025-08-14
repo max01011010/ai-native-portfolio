@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { Button } from "@/components/ui/button";
 
 const TermsAndConditions: React.FC = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   return (
     <div className="container mx-auto px-4 py-12 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen">
       <h1 className="text-4xl font-bold mb-6 text-center">Terms and Conditions</h1>
@@ -66,8 +68,8 @@ const TermsAndConditions: React.FC = () => {
         </p>
 
         <div className="text-center">
-          <Button asChild>
-            <Link to="/">Back to Home</Link>
+          <Button onClick={() => navigate(-1)}>
+            Back
           </Button>
         </div>
       </div>
