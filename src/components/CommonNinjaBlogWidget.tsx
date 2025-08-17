@@ -17,7 +17,7 @@ const CommonNinjaBlogWidget: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-12 bg-white dark:bg-gray-800">
+    <section className="py-12 bg-white dark:bg-gray-800 opacity-0 animate-fade-in-up">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100">Latest Blog Posts</h2>
         <div className="commonninja_component pid-faa886a1-7198-4cd7-be01-d0344d766080"></div>
