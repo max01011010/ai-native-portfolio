@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react';
-import type { EmblaCarouselType } from 'embla-carousel-react/embla-carousel-react'; // Corrected import
+import type { EmblaCarouselType } from 'embla-carousel-react'; // Corrected import
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectsModal from "./ProjectsModal";
 import { cn } from "@/lib/utils";
