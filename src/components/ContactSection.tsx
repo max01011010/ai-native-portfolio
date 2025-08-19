@@ -18,6 +18,7 @@ const ContactSection: React.FC = () => {
   const [mobileShootTrigger, setMobileShootTrigger] = useState(0); // Counter for shoot button presses
   const [mobileRestartTrigger, setMobileRestartTrigger] = useState(0); // Counter for restart button presses
 
+  // Move useCallback definitions here, before the return statement
   const handleThrustStart = useCallback(() => setMobileThrusting(true), []);
   const handleThrustEnd = useCallback(() => setMobileThrusting(false), []);
   const handleRotateLeftStart = useCallback(() => setMobileRotatingLeft(true), []);
@@ -54,9 +55,6 @@ const ContactSection: React.FC = () => {
         <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           or take a quick break😉
         </p>
-        {/* Removed: <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          Have a project idea or just want to say hello? Feel free to reach out!
-        </p> */}
         <a
           href="mailto:contact@maxabardo.work"
           className="inline-block px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-lg opacity-0 animate-fade-in-up"
@@ -80,7 +78,7 @@ const ContactSection: React.FC = () => {
 
       {/* Game Instructions */}
       {!isMobile && ( // Only show keyboard instructions on non-mobile
-        <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms'}>
+        <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms'}}>
           <p>"WASD" to move | "Space" to shoot</p>
         </div>
       )}
