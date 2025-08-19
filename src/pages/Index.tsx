@@ -31,17 +31,37 @@ const Index = () => {
   const handleScroll = useCallback((event: WheelEvent) => {
     if (isThrottled.current) return;
 
-    event.preventDefault(); // Prevent default vertical scrolling
+    const currentSectionElement = containerRef.current?.children[currentSectionIndex] as HTMLElement;
+    if (!currentSectionElement) return;
 
+    const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
     const deltaY = event.deltaY;
-    let newIndex = currentSectionIndex;
 
-    if (deltaY > 0) {
-      // Scroll down
-      newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
-    } else if (deltaY < 0) {
-      // Scroll up
-      newIndex = Math.max(0, currentSectionIndex - 1);
+    let newIndex = currentSectionIndex;
+    let shouldPreventDefault = false;
+
+    if (deltaY > 0) { // Scrolling down
+      if (scrollTop + clientHeight >= scrollHeight) {
+        // At the bottom of the current section, transition to next horizontal section
+        newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+        shouldPreventDefault = true;
+      } else {
+        // Not at the bottom, allow internal vertical scroll
+        shouldPreventDefault = false;
+      }
+    } else if (deltaY < 0) { // Scrolling up
+      if (scrollTop === 0) {
+        // At the top of the current section, transition to previous horizontal section
+        newIndex = Math.max(0, currentSectionIndex - 1);
+        shouldPreventDefault = true;
+      } else {
+        // Not at the top, allow internal vertical scroll
+        shouldPreventDefault = false;
+      }
+    }
+
+    if (shouldPreventDefault) {
+      event.preventDefault(); // Only prevent default if we are transitioning horizontally
     }
 
     if (newIndex !== currentSectionIndex) {
