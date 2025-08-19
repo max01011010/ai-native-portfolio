@@ -16,23 +16,9 @@ const ContactSection: React.FC = () => {
       {/* Overlay to make text readable over the game */}
       <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
 
-      {/* Content of the Contact Section */}
-      <div className="container mx-auto px-4 text-center flex flex-col items-center relative z-20 text-white">
-        <h2 className="text-3xl font-bold mb-8 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
-        <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          Have a project idea or just want to say hello? Feel free to reach out!
-          <br />
-          <span className="text-sm text-gray-300">(You can play a mini-game while you're here!)</span>
-        </p>
-        <a
-          href="mailto:contact@maxabardo.work"
-          className="inline-block px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-lg opacity-0 animate-fade-in-up"
-          style={{ animationDelay: '400ms' }}
-        >
-          Email Me
-        </a>
-        {/* Score keeper and Game Over message */}
-        <div className="mt-4 text-white text-lg font-mono z-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
+      {/* Centered Game Over/Score Message */}
+      {(gameIsOver || gameScore > 0) && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-lg font-mono z-30 text-center opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
           {gameIsOver ? (
             <>
               <h3 className="text-2xl font-bold mb-2">GAME OVER</h3>
@@ -43,6 +29,26 @@ const ContactSection: React.FC = () => {
             <p>Score: {gameScore}</p>
           )}
         </div>
+      )}
+
+      {/* Main Contact Content */}
+      <div className="container mx-auto px-4 text-center flex flex-col items-center relative z-20 text-white">
+        <h2 className="text-3xl font-bold mb-8 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
+        <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          Have a project idea or just want to say hello? Feel free to reach out!
+        </p>
+        <a
+          href="mailto:contact@maxabardo.work"
+          className="inline-block px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-lg opacity-0 animate-fade-in-up"
+          style={{ animationDelay: '400ms' }}
+        >
+          Email Me
+        </a>
+      </div>
+
+      {/* Mini-game instruction at bottom right */}
+      <div className="absolute bottom-24 right-4 z-30 text-right opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms' }}>
+        <p className="text-sm text-gray-300">(You can play a mini-game while you're here!)</p>
       </div>
 
       <div className="container mx-auto px-4 text-center mt-auto relative z-20 text-white">
