@@ -219,7 +219,7 @@ const Index = () => {
         {currentSectionIndex < sections.length - 1 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex + 1)}
-            className="p-2 rounded-full bg-black hover:bg-gray-800 text-white shadow-lg"
+            className="p-2 rounded-full bg-[#794bc4] hover:bg-[#6a3ea8] text-white"
             aria-label="Scroll Right"
           >
             <ChevronRight className="h-6 w-6" />
@@ -228,7 +228,7 @@ const Index = () => {
         {currentSectionIndex > 0 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex - 1)}
-            className="p-2 rounded-full bg-black hover:bg-gray-800 text-white shadow-lg"
+            className="p-2 rounded-full bg-[#794bc4] hover:bg-[#6a3ea8] text-white"
             aria-label="Scroll Left"
           >
             <ChevronLeft className="h-6 w-6" />
