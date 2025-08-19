@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import HeroSection from "@/components/HeroSection";
 import AppCardGrid, { AppCardGridRef } from "@/components/AppCardGrid";
-import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget"; // Import CommonNinjaBlogWidget
+import RssAppBlogWidget from "@/components/RssAppBlogWidget"; // Import RssAppBlogWidget
 import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react"; // Import ChevronLeft and ChevronRight
@@ -16,7 +16,7 @@ type SectionComponent = React.ComponentType<any> & {
 const sections: { id: string; component: SectionComponent }[] = [
   { id: "hero", component: HeroSection },
   { id: "projects", component: AppCardGrid },
-  { id: "blog", component: CommonNinjaBlogWidget },
+  { id: "blog", component: RssAppBlogWidget }, // Use RssAppBlogWidget here
   { id: "contact", component: ContactSection },
 ];
 
