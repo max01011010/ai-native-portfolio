@@ -44,6 +44,8 @@ const RssAppBlogWidget = forwardRef<HTMLElement, RssAppBlogWidgetProps>((props, 
         overlayColor="bg-white" // White overlay
         overlayOpacity={0.2} // Subtle overlay
       />
+      {/* Gradient Overlay for smooth transition to Contact section */}
+      <div className="absolute inset-0 z-[5] bg-gradient-to-l from-purple-800/50 to-transparent"></div>
       <div className="container mx-auto px-4 relative z-10"> {/* Ensure content is above background */}
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100">Latest Blog Posts</h2>
         <rssapp-wall id="BFGuOikO2XywaVsv"></rssapp-wall>
