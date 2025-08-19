@@ -5,11 +5,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react';
-import type { UseEmblaCarouselType } from 'embla-carousel-react'; // Corrected import
+import type { UseEmblaCarouselType } from 'embla-carousel-react';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectsModal from "./ProjectsModal";
 import { cn } from "@/lib/utils";
-import ConstellationBackground from "./ConstellationBackground"; // Import the new component
+import ConstellationBackground from "./ConstellationBackground";
 
 interface AppCardProps {
   id: string;
@@ -55,7 +55,7 @@ const appData: AppCardProps[] = [
 ];
 
 export interface AppCardGridRef {
-  getEmblaApi: () => UseEmblaCarouselType[1] | undefined; // Corrected type here
+  getEmblaApi: () => UseEmblaCarouselType[1] | undefined;
 }
 
 const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
@@ -63,14 +63,13 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
     loop: false,
     align: 'center',
     dragFree: true,
-    containScroll: 'trimSnaps', // Added to ensure proper snapping at ends
+    containScroll: 'trimSnaps', // Keep this for snapping to ends
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0); // State to track selected index
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Update selectedIndex when carousel changes
-  const onSelect = useCallback((emblaApi: UseEmblaCarouselType[1]) => { // Corrected type here
+  const onSelect = useCallback((emblaApi: UseEmblaCarouselType[1]) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, []);
 
@@ -80,9 +79,9 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onSelect(emblaApi); // Set initial selected index
-    emblaApi.on('select', onSelect); // Listen for select events
-    emblaApi.on('reInit', onSelect); // Listen for reInit events (e.g., on resize)
+    onSelect(emblaApi);
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
     return () => {
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
@@ -96,13 +95,13 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
 
       {/* Constellation Background for Projects Section */}
       <ConstellationBackground 
-        particleColor="rgba(0, 0, 0, 0.6)" // Darker particles for light background
-        lineColor="rgba(0, 0, 0, " // Darker lines
-        overlayColor="bg-white" // White overlay
-        overlayOpacity={0.2} // Subtle overlay
+        particleColor="rgba(0, 0, 0, 0.6)"
+        lineColor="rgba(0, 0, 0, "
+        overlayColor="bg-white"
+        overlayOpacity={0.2}
       />
 
-      <div className="container mx-auto px-4 relative z-10"> {/* Ensure content is above background */}
+      <div className="container mx-auto px-4 relative z-10">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 opacity-0 animate-fade-in-up">My Projects</h2>
         <div className="text-center mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `200ms` }}>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -115,17 +114,17 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
           </Dialog>
         </div>
       </div>
-      <div className="embla flex-grow overflow-hidden relative z-10"> {/* Ensure carousel is above background */}
-        <div className="embla__viewport h-full" ref={emblaRef}>
-          <div className="embla__container flex h-full items-center gap-x-6"> {/* Added gap-x-6 for spacing */}
+      <div className="embla flex-grow overflow-hidden relative z-10">
+        <div className="embla__viewport h-full px-8 md:px-16 lg:px-24" ref={emblaRef}> {/* Added responsive horizontal padding */}
+          <div className="embla__container flex h-full items-center"> {/* Reverted to original, removed gap-x-6 */}
             {appData.map((app, index) => (
-              <div key={app.id} className="embla__slide flex-shrink-0 w-full max-w-sm py-4"> {/* Changed width to max-w-sm and removed px-3, flex justify-center items-center */}
+              <div key={app.id} className="embla__slide flex-shrink-0 w-full px-3 py-4"> {/* Reverted to original w-full px-3 */}
                 <Card
                   className={cn(
-                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] w-full", // Removed max-w-sm here as it's now on the slide
+                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] max-w-sm w-full mx-auto", // Added max-w-sm and mx-auto back to Card
                     index === selectedIndex
-                      ? "bg-[#794bc4] text-white" // Highlighted style with Ko-fi color
-                      : "bg-white dark:bg-gray-950" // Default style
+                      ? "bg-[#794bc4] text-white"
+                      : "bg-white dark:bg-gray-950"
                   )}
                   style={{ animationDelay: `${index * 100 + 400}ms` }}
                 >
