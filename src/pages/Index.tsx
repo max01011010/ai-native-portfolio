@@ -6,7 +6,7 @@ import AppCardGrid from "@/components/AppCardGrid";
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
 import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Import ChevronLeft and ChevronRight
 
 const sections = [
   { id: "hero", component: HeroSection },
@@ -165,18 +165,18 @@ const Index = () => {
           <Button
             onClick={() => scrollToSection(currentSectionIndex + 1)}
             className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-            aria-label="Scroll Down"
+            aria-label="Scroll Right"
           >
-            <ChevronDown className="h-6 w-6" />
+            <ChevronRight className="h-6 w-6" />
           </Button>
         )}
         {currentSectionIndex > 0 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex - 1)}
             className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-            aria-label="Scroll Up"
+            aria-label="Scroll Left"
           >
-            <ChevronUp className="h-6 w-6" />
+            <ChevronLeft className="h-6 w-6" />
           </Button>
         )}
       </div>
