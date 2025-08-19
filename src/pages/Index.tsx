@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import HeroSection from "@/components/HeroSection";
-import AppCardGrid from "@/components/AppCardGrid";
+import AppCardGrid, { AppCardGridRef } from "@/components/AppCardGrid"; // Import AppCardGridRef
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
-import ContactSection from "@/components/ContactSection"; // New component for footer content
+import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -12,12 +12,13 @@ const sections = [
   { id: "hero", component: HeroSection },
   { id: "projects", component: AppCardGrid },
   { id: "blog", component: CommonNinjaBlogWidget },
-  { id: "contact", component: ContactSection }, // New section for contact/footer
+  { id: "contact", component: ContactSection },
 ];
 
 const Index = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const appCardGridRef = useRef<AppCardGridRef>(null); // Ref for AppCardGrid
   const isThrottled = useRef(false);
 
   const scrollToSection = useCallback((index: number) => {
@@ -34,34 +35,57 @@ const Index = () => {
     const currentSectionElement = containerRef.current?.children[currentSectionIndex] as HTMLElement;
     if (!currentSectionElement) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
     const deltaY = event.deltaY;
-
     let newIndex = currentSectionIndex;
     let shouldPreventDefault = false;
 
-    if (deltaY > 0) { // Scrolling down
-      if (scrollTop + clientHeight >= scrollHeight) {
-        // At the bottom of the current section, transition to next horizontal section
-        newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
-        shouldPreventDefault = true;
-      } else {
-        // Not at the bottom, allow internal vertical scroll
-        shouldPreventDefault = false;
+    if (sections[currentSectionIndex].id === "projects" && appCardGridRef.current) {
+      // Special handling for the projects carousel
+      const carouselApi = appCardGridRef.current.getEmblaApi();
+      if (carouselApi) {
+        if (deltaY > 0) { // Scrolling down
+          if (carouselApi.canScrollNext()) {
+            carouselApi.scrollNext();
+            shouldPreventDefault = true; // Prevent page scroll, allow carousel scroll
+          } else {
+            // At the end of the carousel, transition to next section
+            newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+            shouldPreventDefault = true;
+          }
+        } else if (deltaY < 0) { // Scrolling up
+          if (carouselApi.canScrollPrev()) {
+            carouselApi.scrollPrev();
+            shouldPreventDefault = true; // Prevent page scroll, allow carousel scroll
+          } else {
+            // At the start of the carousel, transition to previous section
+            newIndex = Math.max(0, currentSectionIndex - 1);
+            shouldPreventDefault = true;
+          }
+        }
       }
-    } else if (deltaY < 0) { // Scrolling up
-      if (scrollTop === 0) {
-        // At the top of the current section, transition to previous horizontal section
-        newIndex = Math.max(0, currentSectionIndex - 1);
-        shouldPreventDefault = true;
-      } else {
-        // Not at the top, allow internal vertical scroll
-        shouldPreventDefault = false;
+    } else {
+      // Standard vertical scroll handling for other sections
+      const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
+
+      if (deltaY > 0) { // Scrolling down
+        if (scrollTop + clientHeight >= scrollHeight) {
+          newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+          shouldPreventDefault = true;
+        } else {
+          shouldPreventDefault = false;
+        }
+      } else if (deltaY < 0) { // Scrolling up
+        if (scrollTop === 0) {
+          newIndex = Math.max(0, currentSectionIndex - 1);
+          shouldPreventDefault = true;
+        } else {
+          shouldPreventDefault = false;
+        }
       }
     }
 
     if (shouldPreventDefault) {
-      event.preventDefault(); // Only prevent default if we are transitioning horizontally
+      event.preventDefault();
     }
 
     if (newIndex !== currentSectionIndex) {
@@ -77,14 +101,47 @@ const Index = () => {
     if (isThrottled.current) return;
 
     let newIndex = currentSectionIndex;
-    if (event.key === "ArrowDown" || event.key === "PageDown") {
-      newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
-    } else if (event.key === "ArrowUp" || event.key === "PageUp") {
-      newIndex = Math.max(0, currentSectionIndex - 1);
+    let handled = false; // Flag to indicate if the event was handled (by carousel or section transition)
+
+    if (sections[currentSectionIndex].id === "projects" && appCardGridRef.current) {
+      const carouselApi = appCardGridRef.current.getEmblaApi();
+      if (carouselApi) {
+        if (event.key === "ArrowRight" || event.key === "ArrowDown" || event.key === "PageDown") {
+          if (carouselApi.canScrollNext()) {
+            carouselApi.scrollNext();
+            handled = true;
+          } else {
+            // At end of carousel, move to next section
+            newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+            handled = true;
+          }
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp" || event.key === "PageUp") {
+          if (carouselApi.canScrollPrev()) {
+            carouselApi.scrollPrev();
+            handled = true;
+          } else {
+            // At start of carousel, move to previous section
+            newIndex = Math.max(0, currentSectionIndex - 1);
+            handled = true;
+          }
+        }
+      }
+    } else {
+      // Standard section transition for other sections
+      if (event.key === "ArrowDown" || event.key === "PageDown") {
+        newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+        handled = true;
+      } else if (event.key === "ArrowUp" || event.key === "PageUp") {
+        newIndex = Math.max(0, currentSectionIndex - 1);
+        handled = true;
+      }
     }
 
-    if (newIndex !== currentSectionIndex) {
-      scrollToSection(newIndex);
+    if (handled) {
+      event.preventDefault(); // Prevent default browser scroll if we handled it
+      if (newIndex !== currentSectionIndex) {
+        scrollToSection(newIndex);
+      }
       isThrottled.current = true;
       setTimeout(() => {
         isThrottled.current = false;
@@ -113,9 +170,13 @@ const Index = () => {
           <div
             key={section.id}
             id={section.id}
-            className="flex-shrink-0 w-screen h-screen overflow-y-auto" // Each section takes full screen and can scroll internally
+            className={`flex-shrink-0 w-screen h-screen ${section.id !== "projects" ? "overflow-y-auto" : ""}`}
           >
-            {React.createElement(section.component)}
+            {section.id === "projects" ? (
+              <section.component ref={appCardGridRef} />
+            ) : (
+              <section.component />
+            )}
           </div>
         ))}
       </div>

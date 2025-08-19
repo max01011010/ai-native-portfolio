@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
 
 interface AppCardProps {
   id: string;
@@ -48,41 +49,69 @@ const appData: AppCardProps[] = [
   },
 ];
 
-const AppCardGrid: React.FC = () => {
+// Define the interface for the ref exposed by AppCardGrid
+export interface AppCardGridRef {
+  getEmblaApi: () => EmblaCarouselType | undefined;
+}
+
+const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'start',
+    dragFree: true,
+  });
+
+  // Expose the Embla API through the ref
+  useImperativeHandle(ref, () => ({
+    getEmblaApi: () => emblaApi,
+  }));
+
+  // Optional: Add some basic Embla event listeners if needed for internal component state
+  useEffect(() => {
+    if (!emblaApi) return;
+    // For example, to log current slide:
+    // emblaApi.on('select', () => console.log('Current slide:', emblaApi.selectedScrollSnap()));
+  }, [emblaApi]);
+
   return (
-    <section className="py-12 bg-gray-50 dark:bg-gray-900 h-full overflow-y-auto"> {/* Added h-full and overflow-y-auto */}
+    <section id="projects" className="py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 opacity-0 animate-fade-in-up">My Projects</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {appData.map((app, index) => (
-            <Card
-              key={app.id}
-              className="flex flex-col h-full opacity-0 animate-fade-in-up transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-              style={{ animationDelay: `${index * 100 + 200}ms` }}
-            >
-              <CardHeader>
-                <img src={app.imageUrl} alt={app.title} className="w-full h-48 object-cover rounded-md mb-4" />
-                <CardTitle>{app.title}</CardTitle>
-                <CardDescription>{app.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-grow"></CardContent>
-              <CardFooter>
-                <Button asChild className="w-full" disabled={app.isComingSoon}>
-                  {app.isComingSoon ? (
-                    <span>Coming Soon!</span>
-                  ) : (
-                    <a href={app.link} target="_blank" rel="noopener noreferrer">
-                      View Project <ExternalLink className="ml-2 h-4 w-4" />
-                    </a>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+      </div>
+      <div className="embla flex-grow overflow-hidden relative">
+        <div className="embla__viewport h-full" ref={emblaRef}>
+          <div className="embla__container flex h-full items-center">
+            {appData.map((app, index) => (
+              <div key={app.id} className="embla__slide flex-shrink-0 w-[80vw] sm:w-[45vw] lg:w-[30vw] xl:w-[22vw] px-3">
+                <Card
+                  className="flex flex-col h-[90%] opacity-0 animate-fade-in-up transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+                  style={{ animationDelay: `${index * 100 + 200}ms` }}
+                >
+                  <CardHeader>
+                    <img src={app.imageUrl} alt={app.title} className="w-full h-48 object-cover rounded-md mb-4" />
+                    <CardTitle>{app.title}</CardTitle>
+                    <CardDescription>{app.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow"></CardContent>
+                  <CardFooter>
+                    <Button asChild className="w-full" disabled={app.isComingSoon}>
+                      {app.isComingSoon ? (
+                        <span>Coming Soon!</span>
+                      ) : (
+                        <a href={app.link} target="_blank" rel="noopener noreferrer">
+                          View Project <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                      )}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
-};
+});
 
 export default AppCardGrid;
