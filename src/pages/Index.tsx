@@ -60,31 +60,45 @@ const Index = () => {
 
       const currentDirection = deltaY > 0 ? 'down' : 'up';
 
-      // If already waiting for a transition in the same direction, do nothing
-      if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
-        return;
-      }
+      // Determine if a delay should be applied for the *current* section
+      const shouldApplyDelay = currentSectionIndex === 1 || currentSectionIndex === 2; // Index 1 is Projects, Index 2 is Blog
 
-      // Clear any existing timeout (e.g., if direction changed or new scroll initiated)
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
-      }
+      if (shouldApplyDelay) {
+        // If already waiting for a transition in the same direction, do nothing
+        if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
+          return;
+        }
 
-      // Start new timeout for horizontal transition
-      lastScrollDirectionRef.current = currentDirection;
-      scrollTimeoutRef.current = window.setTimeout(() => {
-        if (!isTransitioningRef.current) { // Only transition if not already in progress
+        // Clear any existing timeout (e.g., if direction changed or new scroll initiated)
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+          scrollTimeoutRef.current = null;
+        }
+
+        // Start new timeout for horizontal transition
+        lastScrollDirectionRef.current = currentDirection;
+        scrollTimeoutRef.current = window.setTimeout(() => {
+          if (!isTransitioningRef.current) { // Only transition if not already in progress
+            isTransitioningRef.current = true;
+            scrollToSection(potentialNewIndex);
+            // After the transition animation, allow new transitions
+            setTimeout(() => {
+              isTransitioningRef.current = false;
+            }, 700); // Match CSS transition duration
+          }
+          scrollTimeoutRef.current = null; // Clear timeout ID after it fires
+          lastScrollDirectionRef.current = null;
+        }, 1500); // 1.5 second delay
+      } else {
+        // No delay for Hero or Contact sections, transition immediately
+        if (!isTransitioningRef.current) {
           isTransitioningRef.current = true;
           scrollToSection(potentialNewIndex);
-          // After the transition animation, allow new transitions
           setTimeout(() => {
             isTransitioningRef.current = false;
           }, 700); // Match CSS transition duration
         }
-        scrollTimeoutRef.current = null; // Clear timeout ID after it fires
-        lastScrollDirectionRef.current = null;
-      }, 3000); // 3 second delay
+      }
     } else {
       // Not at a vertical edge, or no horizontal section to transition to
       // Allow internal vertical scrolling
@@ -109,9 +123,8 @@ const Index = () => {
     }
 
     if (newIndex !== currentSectionIndex) {
-      event.preventDefault(); // Prevent default page scroll
-      isTransitioningRef.current = true;
       scrollToSection(newIndex);
+      isTransitioningRef.current = true;
       setTimeout(() => {
         isTransitioningRef.current = false;
       }, 700); // Match CSS transition duration
@@ -139,7 +152,7 @@ const Index = () => {
           <div
             key={section.id}
             id={section.id}
-            className="flex-shrink-0 w-screen h-screen overflow-y-auto"
+            className="flex-shrink-0 w-screen h-screen overflow-y-auto" // Each section takes full screen and can scroll internally
           >
             {React.createElement(section.component, { isActive: index === currentSectionIndex })}
           </div>
