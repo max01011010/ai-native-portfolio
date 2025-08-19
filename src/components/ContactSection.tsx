@@ -16,6 +16,11 @@ const ContactSection: React.FC = () => {
       {/* Overlay to make text readable over the game */}
       <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
 
+      {/* Game Instructions */}
+      <div className="absolute top-4 left-4 z-20 text-white text-sm md:text-base font-mono opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+        <p>"WASD" to move | "Space" to shoot</p>
+      </div>
+
       {/* Content of the Contact Section */}
       <div className="container mx-auto px-4 text-center flex flex-col items-center relative z-20 text-white">
         <h2 className="text-3xl font-bold mb-2 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
