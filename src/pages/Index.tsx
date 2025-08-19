@@ -215,7 +215,7 @@ const Index = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-4 right-24 flex flex-row space-x-2 z-50">
+      <div className="absolute bottom-4 right-8 flex flex-row space-x-2 z-50">
         {currentSectionIndex > 0 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex - 1)}
