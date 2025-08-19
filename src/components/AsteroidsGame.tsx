@@ -51,7 +51,7 @@ const AsteroidsGame: React.FC = () => {
     rotatingLeft: false,
     rotatingRight: false,
     bullets: [],
-    color: "white",
+    color: "white", // Changed to white
   });
   const asteroidsRef = useRef<Asteroid[]>([]);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
@@ -113,7 +113,7 @@ const AsteroidsGame: React.FC = () => {
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       radius,
-      color: "gray",
+      color: "white", // Changed to white
     });
   }, []);
 
@@ -300,7 +300,7 @@ const AsteroidsGame: React.FC = () => {
         vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
         radius: 2,
         lifespan: BULLET_LIFESPAN,
-        color: "yellow",
+        color: "white", // Changed to white
       });
     }
     if (e.code === "KeyR" && isGameOver) {
