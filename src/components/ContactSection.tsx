@@ -38,7 +38,7 @@ const ContactSection: React.FC = () => {
             <>
               <p className="text-xl mb-2">Final Score: {gameScore}</p>
               <p className="text-base mb-2">Press 'R' to Restart</p>
-              <h3 className="text-2xl font-bold">GAME OVER</h3>
+              <h3 className="text-2xl font-bold">Oops, break over!</h3>
             </>
           ) : (
             <p>Score: {gameScore}</p>
@@ -47,11 +47,11 @@ const ContactSection: React.FC = () => {
       </div>
 
       {/* Game Instructions - Moved here to be above the footer */}
-      <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+      <div className="text-white text-sm md:text-base font-mono z-20 mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
         <p>"WASD" to move | "Space" to shoot</p>
       </div>
 
-      <div className="container mx-auto px-4 text-center relative z-20 text-white">
+      <div className="container mx-auto px-4 text-center mt-auto relative z-20 text-white">
         <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-4">
           <a
             href="https://www.dyad.sh/"
