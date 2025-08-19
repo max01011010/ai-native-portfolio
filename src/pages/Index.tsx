@@ -18,8 +18,6 @@ const sections = [
 const Index = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<number | null>(null);
-  const lastScrollDirectionRef = useRef<'up' | 'down' | null>(null);
   const isTransitioningRef = useRef(false); // To prevent rapid horizontal transitions during animation
 
   const scrollToSection = useCallback((index: number) => {
@@ -78,40 +76,13 @@ const Index = () => {
     if (shouldTransitionHorizontally) {
       event.preventDefault(); // Prevent default vertical scroll ONLY if a horizontal transition is intended
 
-      const currentDirection = deltaY > 0 ? 'down' : 'up';
-      const shouldApplyDelay = currentSectionIndex === 1 || currentSectionIndex === 2; // Projects and Blog sections
-
-      if (shouldApplyDelay) {
-        if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
-          return; // Already waiting for a transition in the same direction
-        }
-
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-          scrollTimeoutRef.current = null;
-        }
-
-        lastScrollDirectionRef.current = currentDirection;
-        scrollTimeoutRef.current = window.setTimeout(() => {
-          if (!isTransitioningRef.current) {
-            isTransitioningRef.current = true;
-            scrollToSection(targetSectionIndex);
-            setTimeout(() => {
-              isTransitioningRef.current = false;
-            }, 700);
-          }
-          scrollTimeoutRef.current = null;
-          lastScrollDirectionRef.current = null;
-        }, 1500);
-      } else {
-        // No delay, transition immediately
-        if (!isTransitioningRef.current) {
-          isTransitioningRef.current = true;
-          scrollToSection(targetSectionIndex);
-          setTimeout(() => {
-            isTransitioningRef.current = false;
-          }, 700);
-        }
+      // Transition immediately (removed delay logic)
+      if (!isTransitioningRef.current) {
+        isTransitioningRef.current = true;
+        scrollToSection(targetSectionIndex);
+        setTimeout(() => {
+          isTransitioningRef.current = false;
+        }, 700); // Match CSS transition duration
       }
     }
     // If shouldTransitionHorizontally is false, we do NOT call event.preventDefault(),
