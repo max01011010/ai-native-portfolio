@@ -32,7 +32,7 @@ const ContactSection: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative py-12 bg-gradient-to-br from-blue-700 to-purple-800 text-white h-full flex flex-col justify-between items-center overflow-hidden">
+    <section className="relative py-12 bg-gradient-to-l from-blue-700 to-purple-800 text-white h-full flex flex-col justify-between items-center overflow-hidden">
       {/* Asteroids game background */}
       <AsteroidsGame
         onScoreChange={setGameScore}
@@ -80,7 +80,7 @@ const ContactSection: React.FC = () => {
 
       {/* Game Instructions */}
       {!isMobile && ( // Only show keyboard instructions on non-mobile
-        <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+        <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms'}>
           <p>"WASD" to move | "Space" to shoot</p>
         </div>
       )}
