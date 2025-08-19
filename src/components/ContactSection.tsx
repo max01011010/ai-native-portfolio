@@ -39,8 +39,8 @@ const ContactSection: React.FC = () => {
         onGameOver={setGameIsOver}
         // Pass mobile control states/triggers to the game
         isThrusting={mobileThrusting}
-        isRotatingLeft={mobileRotatingLeft}
-        isRotatingRight={mobileRotatingRight}
+        isRotatingLeft={isRotatingLeft}
+        isRotatingRight={isRotatingRight}
         shootTrigger={mobileShootTrigger}
         restartTrigger={mobileRestartTrigger}
       />
@@ -50,13 +50,13 @@ const ContactSection: React.FC = () => {
 
       {/* Content of the Contact Section */}
       <div className="container mx-auto px-4 text-center flex flex-col items-center relative z-20 text-white">
-        <h2 className="text-3xl font-bold mb-2 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
+        <h2 className="text-3xl font-bold mb-2 text-gray-100 opacity-0 animate-fade-in-up">Feel free to reach out</h2>
         <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          or take a short game break 😉
+          or take a quick break😉
         </p>
-        <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+        {/* Removed: <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           Have a project idea or just want to say hello? Feel free to reach out!
-        </p>
+        </p> */}
         <a
           href="mailto:contact@maxabardo.work"
           className="inline-block px-8 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-lg opacity-0 animate-fade-in-up"
