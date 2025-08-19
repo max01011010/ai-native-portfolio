@@ -35,17 +35,6 @@ const CommonNinjaBlogWidget = forwardRef<HTMLElement, CommonNinjaBlogWidgetProps
       initializeWidget();
     }
 
-    // Add type definition for CommonNinja to window object
-    declare global {
-      interface Window {
-        CommonNinja?: {
-          init?: () => void;
-          refresh?: () => void;
-          // Add other methods if known
-        };
-      }
-    }
-
   }, []); // Empty dependency array means it runs once on mount
 
   return (

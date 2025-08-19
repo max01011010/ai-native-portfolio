@@ -4,7 +4,8 @@ import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, us
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
-import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
+import type { EmblaCarouselType } from 'embla-carousel-react/embla-carousel-react'; // Corrected import
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectsModal from "./ProjectsModal";
 import { cn } from "@/lib/utils";

@@ -8,7 +8,12 @@ import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react"; // Import ChevronLeft and ChevronRight
 
-const sections = [
+// Define a type that allows components to accept a ref
+type SectionComponent = React.ComponentType<any> & {
+  ref?: React.Ref<any>;
+};
+
+const sections: { id: string; component: SectionComponent }[] = [
   { id: "hero", component: HeroSection },
   { id: "projects", component: AppCardGrid },
   { id: "blog", component: CommonNinjaBlogWidget },

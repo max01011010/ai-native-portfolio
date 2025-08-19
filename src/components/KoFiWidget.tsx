@@ -37,15 +37,6 @@ const KoFiWidget: React.FC = () => {
       }
     }
 
-    // Add type definition for kofiWidgetOverlay to window object
-    declare global {
-      interface Window {
-        kofiWidgetOverlay: {
-          draw: (username: string, options: object) => void;
-        };
-      }
-    }
-
     return () => {
       // Optional: Clean up the widget if the component unmounts
       // For floating widgets, this might not be strictly necessary as they often persist
