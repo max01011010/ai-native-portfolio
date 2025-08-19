@@ -110,7 +110,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
                   className={cn(
                     "flex flex-col h-[90%] transition-all duration-300 hover:shadow-xl hover:scale-[1.02]",
                     index === selectedIndex
-                      ? "bg-purple-600 text-white" // Highlighted style
+                      ? "bg-[#794bc4] text-white" // Highlighted style with Ko-fi color
                       : "bg-white dark:bg-gray-950" // Default style
                   )}
                   style={{ animationDelay: `${index * 100 + 400}ms` }}
@@ -124,7 +124,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
                   </CardHeader>
                   <CardContent className="flex-grow"></CardContent>
                   <CardFooter>
-                    <Button asChild className={cn("w-full", index === selectedIndex ? "bg-white text-purple-600 hover:bg-gray-100" : "")} disabled={app.isComingSoon}>
+                    <Button asChild className={cn("w-full", index === selectedIndex ? "bg-white text-[#794bc4] hover:bg-gray-100" : "")} disabled={app.isComingSoon}>
                       {app.isComingSoon ? (
                         <span>Coming Soon!</span>
                       ) : (
