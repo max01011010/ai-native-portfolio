@@ -174,7 +174,7 @@ const HeroSection: React.FC = () => {
 
   return (
     <section
-      className="relative w-full py-20 md:py-32 lg:py-40 bg-gradient-to-br from-blue-700 to-purple-800 text-white flex items-center justify-center text-center overflow-hidden"
+      className="relative w-full h-full bg-gradient-to-br from-blue-700 to-purple-800 text-white flex items-center justify-center text-center overflow-hidden"
     >
       {/* Canvas for the interactive background */}
       <canvas ref={canvasRef} className="absolute inset-0 z-0"></canvas>
