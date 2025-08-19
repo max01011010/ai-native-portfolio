@@ -37,78 +37,76 @@ const Index = () => {
     const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
     const deltaY = event.deltaY;
 
-    let potentialNewIndex = currentSectionIndex;
-    let atEdge = false;
+    // Determine if we are at the vertical edge of the current section
+    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+    const atTop = scrollTop <= 1;
+
+    let shouldAttemptHorizontalTransition = false;
+    let targetSectionIndex = currentSectionIndex;
 
     if (deltaY > 0) { // Scrolling down
-      // Check if at the bottom of the scrollable content (with a small buffer for precision)
-      if (scrollTop + clientHeight >= scrollHeight - 1) {
-        atEdge = true;
-        potentialNewIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+      if (atBottom) {
+        if (currentSectionIndex < sections.length - 1) {
+          shouldAttemptHorizontalTransition = true;
+          targetSectionIndex = currentSectionIndex + 1;
+        }
       }
     } else if (deltaY < 0) { // Scrolling up
-      // Check if at the top of the scrollable content (with a small buffer for precision)
-      if (scrollTop <= 1) {
-        atEdge = true;
-        potentialNewIndex = Math.max(0, currentSectionIndex - 1);
+      if (atTop) {
+        if (currentSectionIndex > 0) {
+          shouldAttemptHorizontalTransition = true;
+          targetSectionIndex = currentSectionIndex - 1;
+        }
       }
     }
 
-    if (atEdge && potentialNewIndex !== currentSectionIndex) {
-      // We are at a vertical edge and there's a horizontal section to transition to
-      event.preventDefault(); // Prevent default vertical scroll
+    if (shouldAttemptHorizontalTransition) {
+      event.preventDefault(); // Prevent default vertical scroll ONLY if a horizontal transition is intended
 
       const currentDirection = deltaY > 0 ? 'down' : 'up';
-
-      // Determine if a delay should be applied for the *current* section
       const shouldApplyDelay = currentSectionIndex === 1 || currentSectionIndex === 2; // Index 1 is Projects, Index 2 is Blog
 
       if (shouldApplyDelay) {
-        // If already waiting for a transition in the same direction, do nothing
         if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
-          return;
+          return; // Already waiting for a transition in the same direction
         }
 
-        // Clear any existing timeout (e.g., if direction changed or new scroll initiated)
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current);
           scrollTimeoutRef.current = null;
         }
 
-        // Start new timeout for horizontal transition
         lastScrollDirectionRef.current = currentDirection;
         scrollTimeoutRef.current = window.setTimeout(() => {
-          if (!isTransitioningRef.current) { // Only transition if not already in progress
+          if (!isTransitioningRef.current) {
             isTransitioningRef.current = true;
-            scrollToSection(potentialNewIndex);
-            // After the transition animation, allow new transitions
+            scrollToSection(targetSectionIndex);
             setTimeout(() => {
               isTransitioningRef.current = false;
-            }, 700); // Match CSS transition duration
+            }, 700);
           }
-          scrollTimeoutRef.current = null; // Clear timeout ID after it fires
+          scrollTimeoutRef.current = null;
           lastScrollDirectionRef.current = null;
-        }, 1500); // 1.5 second delay
+        }, 1500);
       } else {
-        // No delay for Hero or Contact sections, transition immediately
+        // No delay, transition immediately
         if (!isTransitioningRef.current) {
           isTransitioningRef.current = true;
-          scrollToSection(potentialNewIndex);
+          scrollToSection(targetSectionIndex);
           setTimeout(() => {
             isTransitioningRef.current = false;
-          }, 700); // Match CSS transition duration
+          }, 700);
         }
       }
     } else {
-      // Not at a vertical edge, or no horizontal section to transition to
-      // Allow internal vertical scrolling
-      // Clear any pending horizontal transition timeout
+      // If no horizontal transition is attempted, ensure any pending timeout is cleared
+      // and allow normal vertical scrolling.
       if (scrollTimeoutRef.current) {
         clearTimeout(scrollTimeoutRef.current);
         scrollTimeoutRef.current = null;
         lastScrollDirectionRef.current = null;
       }
-      // Do not prevent default, let the browser handle vertical scroll
+      // No preventDefault here, so vertical scrolling is allowed.
     }
   }, [currentSectionIndex, scrollToSection]);
 
