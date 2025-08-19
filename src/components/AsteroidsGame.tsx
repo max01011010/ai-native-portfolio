@@ -9,6 +9,8 @@ const PLAYER_THRUST = 0.05;
 const PLAYER_FRICTION = 0.99;
 const BULLET_SPEED = 7;
 const BULLET_LIFESPAN = 60; // frames
+const BULLET_RADIUS = 4; // Increased bullet size
+const MAX_BULLETS = 5; // Limit to 5 bullets at a time
 const ASTEROID_SPEED = 1;
 const ASTEROID_SIZE_MIN = 20;
 const ASTEROID_SIZE_MAX = 60;
@@ -304,15 +306,17 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
     }
     if (e.code === "Space" && !gameIsOver.current) {
       e.preventDefault(); // Prevent scrolling
-      player.bullets.push({
-        x: player.x + Math.cos(player.angle - Math.PI / 2) * player.radius,
-        y: player.y + Math.sin(player.angle - Math.PI / 2) * player.radius,
-        vx: player.vx + Math.cos(player.angle - Math.PI / 2) * BULLET_SPEED,
-        vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
-        radius: 2,
-        lifespan: BULLET_LIFESPAN,
-        color: "red", // Red color for bullets
-      });
+      if (player.bullets.length < MAX_BULLETS) { // Check bullet limit
+        player.bullets.push({
+          x: player.x + Math.cos(player.angle - Math.PI / 2) * player.radius,
+          y: player.y + Math.sin(player.angle - Math.PI / 2) * player.radius,
+          vx: player.vx + Math.cos(player.angle - Math.PI / 2) * BULLET_SPEED,
+          vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
+          radius: BULLET_RADIUS, // Use the new bullet radius
+          lifespan: BULLET_LIFESPAN,
+          color: "red", // Red color for bullets
+        });
+      }
     }
     if (e.code === "KeyR" && gameIsOver.current) {
       initGame();
