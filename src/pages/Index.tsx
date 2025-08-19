@@ -6,7 +6,7 @@ import AppCardGrid from "@/components/AppCardGrid";
 import CommonNinjaBlogWidget from "@/components/CommonNinjaBlogWidget";
 import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react"; // Import ChevronLeft and ChevronRight
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const sections = [
   { id: "hero", component: HeroSection },
@@ -18,6 +18,8 @@ const sections = [
 const Index = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<number | null>(null);
+  const lastScrollDirectionRef = useRef<'up' | 'down' | null>(null);
   const isTransitioningRef = useRef(false); // To prevent rapid horizontal transitions during animation
 
   const scrollToSection = useCallback((index: number) => {
@@ -29,64 +31,71 @@ const Index = () => {
   }, []);
 
   const handleScroll = useCallback((event: WheelEvent) => {
-    if (isTransitioningRef.current) {
-      event.preventDefault(); // Prevent any scrolling during horizontal transition
-      return;
-    }
-
     const currentSectionElement = containerRef.current?.children[currentSectionIndex] as HTMLElement;
     if (!currentSectionElement) return;
 
     const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
     const deltaY = event.deltaY;
 
-    // Define a small buffer for detecting scroll edges
-    const scrollEdgeBuffer = 5; // Pixels from the edge to consider "at the edge"
-
-    // Check if the current section has vertical scrollable content
-    const canScrollVertically = scrollHeight > clientHeight + scrollEdgeBuffer;
-
-    let shouldTransitionHorizontally = false;
-    let targetSectionIndex = currentSectionIndex;
+    let potentialNewIndex = currentSectionIndex;
+    let atEdge = false;
 
     if (deltaY > 0) { // Scrolling down
-      if (canScrollVertically && scrollTop + clientHeight < scrollHeight - scrollEdgeBuffer) {
-        // Still content to scroll down vertically, allow default scroll
-        return;
-      }
-      // If we are here, it means we are at the bottom or cannot scroll vertically.
-      // Attempt horizontal transition if possible.
-      if (currentSectionIndex < sections.length - 1) {
-        shouldTransitionHorizontally = true;
-        targetSectionIndex = currentSectionIndex + 1;
+      // Check if at the bottom of the scrollable content (with a small buffer for precision)
+      if (scrollTop + clientHeight >= scrollHeight - 1) {
+        atEdge = true;
+        potentialNewIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
       }
     } else if (deltaY < 0) { // Scrolling up
-      if (canScrollVertically && scrollTop > scrollEdgeBuffer) {
-        // Still content to scroll up vertically, allow default scroll
+      // Check if at the top of the scrollable content (with a small buffer for precision)
+      if (scrollTop <= 1) {
+        atEdge = true;
+        potentialNewIndex = Math.max(0, currentSectionIndex - 1);
+      }
+    }
+
+    if (atEdge && potentialNewIndex !== currentSectionIndex) {
+      // We are at a vertical edge and there's a horizontal section to transition to
+      event.preventDefault(); // Prevent default vertical scroll
+
+      const currentDirection = deltaY > 0 ? 'down' : 'up';
+
+      // If already waiting for a transition in the same direction, do nothing
+      if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
         return;
       }
-      // If we are here, it means we are at the top or cannot scroll vertically.
-      // Attempt horizontal transition if possible.
-      if (currentSectionIndex > 0) {
-        shouldTransitionHorizontally = true;
-        targetSectionIndex = currentSectionIndex - 1;
-      }
-    }
 
-    if (shouldTransitionHorizontally) {
-      event.preventDefault(); // Prevent default vertical scroll ONLY if a horizontal transition is intended
-
-      // Transition immediately (removed delay logic)
-      if (!isTransitioningRef.current) {
-        isTransitioningRef.current = true;
-        scrollToSection(targetSectionIndex);
-        setTimeout(() => {
-          isTransitioningRef.current = false;
-        }, 700); // Match CSS transition duration
+      // Clear any existing timeout (e.g., if direction changed or new scroll initiated)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
       }
+
+      // Start new timeout for horizontal transition
+      lastScrollDirectionRef.current = currentDirection;
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        if (!isTransitioningRef.current) { // Only transition if not already in progress
+          isTransitioningRef.current = true;
+          scrollToSection(potentialNewIndex);
+          // After the transition animation, allow new transitions
+          setTimeout(() => {
+            isTransitioningRef.current = false;
+          }, 700); // Match CSS transition duration
+        }
+        scrollTimeoutRef.current = null; // Clear timeout ID after it fires
+        lastScrollDirectionRef.current = null;
+      }, 3000); // 3 second delay
+    } else {
+      // Not at a vertical edge, or no horizontal section to transition to
+      // Allow internal vertical scrolling
+      // Clear any pending horizontal transition timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+        lastScrollDirectionRef.current = null;
+      }
+      // Do not prevent default, let the browser handle vertical scroll
     }
-    // If shouldTransitionHorizontally is false, we do NOT call event.preventDefault(),
-    // allowing the browser to handle the natural vertical scroll.
   }, [currentSectionIndex, scrollToSection]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -100,8 +109,9 @@ const Index = () => {
     }
 
     if (newIndex !== currentSectionIndex) {
-      scrollToSection(newIndex);
+      event.preventDefault(); // Prevent default page scroll
       isTransitioningRef.current = true;
+      scrollToSection(newIndex);
       setTimeout(() => {
         isTransitioningRef.current = false;
       }, 700); // Match CSS transition duration
@@ -129,7 +139,7 @@ const Index = () => {
           <div
             key={section.id}
             id={section.id}
-            className="flex-shrink-0 w-screen h-screen overflow-y-auto" // Each section takes full screen and can scroll internally
+            className="flex-shrink-0 w-screen h-screen overflow-y-auto"
           >
             {React.createElement(section.component, { isActive: index === currentSectionIndex })}
           </div>
@@ -142,18 +152,18 @@ const Index = () => {
           <Button
             onClick={() => scrollToSection(currentSectionIndex + 1)}
             className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-            aria-label="Scroll Right"
+            aria-label="Scroll Down"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronDown className="h-6 w-6" />
           </Button>
         )}
         {currentSectionIndex > 0 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex - 1)}
             className="p-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-            aria-label="Scroll Left"
+            aria-label="Scroll Up"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronUp className="h-6 w-6" />
           </Button>
         )}
       </div>
