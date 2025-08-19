@@ -42,28 +42,22 @@ interface Asteroid extends GameObject {}
 interface AsteroidsGameProps {
   onScoreChange: (score: number) => void;
   onGameOver: (isOver: boolean) => void;
-  // New props for mobile controls
-  onThrustStart?: () => void;
-  onThrustEnd?: () => void;
-  onRotateLeftStart?: () => void;
-  onRotateLeftEnd?: () => void;
-  onRotateRightStart?: () => void;
-  onRotateRightEnd?: () => void;
-  onShoot?: () => void;
-  onRestartGame?: () => void;
+  // New props for mobile controls state
+  isThrusting: boolean;
+  isRotatingLeft: boolean;
+  isRotatingRight: boolean;
+  shootTrigger: number; // A counter that increments on each shoot request
+  restartTrigger: number; // A counter that increments on each restart request
 }
 
 const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
   onScoreChange,
   onGameOver,
-  onThrustStart,
-  onThrustEnd,
-  onRotateLeftStart,
-  onRotateLeftEnd,
-  onRotateRightStart,
-  onRotateRightEnd,
-  onShoot,
-  onRestartGame,
+  isThrusting,
+  isRotatingLeft,
+  isRotatingRight,
+  shootTrigger,
+  restartTrigger,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
@@ -84,6 +78,9 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
   const keysPressed = useRef<{ [key: string]: boolean }>({});
   const currentScore = useRef(0);
   const gameIsOver = useRef(false);
+  const lastShootTrigger = useRef(0); // To detect changes in shootTrigger prop
+  const lastRestartTrigger = useRef(0); // To detect changes in restartTrigger prop
+
 
   const initGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -215,7 +212,12 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
     const player = playerRef.current;
     const asteroids = asteroidsRef.current;
 
-    // Player rotation (from keyboard or touch controls)
+    // Combine keyboard and mobile inputs for player controls
+    player.thrusting = (keysPressed.current["ArrowUp"] || keysPressed.current["KeyW"]) || isThrusting;
+    player.rotatingLeft = (keysPressed.current["ArrowLeft"] || keysPressed.current["KeyA"]) || isRotatingLeft;
+    player.rotatingRight = (keysPressed.current["ArrowRight"] || keysPressed.current["KeyD"]) || isRotatingRight;
+
+    // Player rotation
     if (player.rotatingLeft) {
       player.angle -= PLAYER_ROTATION_SPEED;
     }
@@ -223,7 +225,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
       player.angle += PLAYER_ROTATION_SPEED;
     }
 
-    // Player thrust (from keyboard or touch controls)
+    // Player thrust
     if (player.thrusting) {
       player.vx += Math.cos(player.angle - Math.PI / 2) * PLAYER_THRUST;
       player.vy += Math.sin(player.angle - Math.PI / 2) * PLAYER_THRUST;
@@ -303,7 +305,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
         break;
       }
     }
-  }, [onScoreChange, onGameOver]);
+  }, [isThrusting, isRotatingLeft, isRotatingRight, onScoreChange, onGameOver]); // Add new props to dependencies
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
@@ -328,53 +330,36 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     keysPressed.current[e.code] = true;
-    const player = playerRef.current;
-
-    if (e.code === "ArrowUp" || e.code === "KeyW") {
-      player.thrusting = true;
-    }
-    if (e.code === "ArrowLeft" || e.code === "KeyA") {
-      player.rotatingLeft = true;
-    }
-    if (e.code === "ArrowRight" || e.code === "KeyD") {
-      player.rotatingRight = true;
-    }
     if (e.code === "Space" && !gameIsOver.current) {
       e.preventDefault(); // Prevent scrolling
       fireBullet();
     }
     if (e.code === "KeyR" && gameIsOver.current) {
-      onRestartGame?.(); // Use optional chaining
+      initGame(); // Restart game directly from here
+      gameLoop(); // Start game loop again
     }
-  }, [fireBullet, onRestartGame]);
+  }, [fireBullet, initGame, gameLoop]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     keysPressed.current[e.code] = false;
-    const player = playerRef.current;
-
-    if (e.code === "ArrowUp" || e.code === "KeyW") {
-      player.thrusting = false;
-    }
-    if (e.code === "ArrowLeft" || e.code === "KeyA") {
-      player.rotatingLeft = false;
-    }
-    if (e.code === "ArrowRight" || e.code === "KeyD") {
-      player.rotatingRight = false;
-    }
   }, []);
 
-  // Callbacks for mobile controls
-  const handleThrustStart = useCallback(() => { playerRef.current.thrusting = true; }, []);
-  const handleThrustEnd = useCallback(() => { playerRef.current.thrusting = false; }, []);
-  const handleRotateLeftStart = useCallback(() => { playerRef.current.rotatingLeft = true; }, []);
-  const handleRotateLeftEnd = useCallback(() => { playerRef.current.rotatingLeft = false; }, []);
-  const handleRotateRightStart = useCallback(() => { playerRef.current.rotatingRight = true; }, []);
-  const handleRotateRightEnd = useCallback(() => { playerRef.current.rotatingRight = false; }, []);
-  const handleShoot = useCallback(() => { fireBullet(); }, [fireBullet]);
-  const handleRestart = useCallback(() => {
-    initGame();
-    gameLoop();
-  }, [initGame, gameLoop]);
+  // Effect to handle shoot trigger from parent (mobile controls)
+  useEffect(() => {
+    if (shootTrigger > lastShootTrigger.current) {
+      fireBullet();
+    }
+    lastShootTrigger.current = shootTrigger;
+  }, [shootTrigger, fireBullet]);
+
+  // Effect to handle restart trigger from parent (mobile controls)
+  useEffect(() => {
+    if (restartTrigger > lastRestartTrigger.current) {
+      initGame();
+      gameLoop();
+    }
+    lastRestartTrigger.current = restartTrigger;
+  }, [restartTrigger, initGame, gameLoop]);
 
 
   useEffect(() => {
@@ -404,23 +389,6 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
       window.removeEventListener("resize", handleResize);
     };
   }, [initGame, gameLoop, handleKeyDown, handleKeyUp]);
-
-  // Expose control handlers via props
-  useEffect(() => {
-    if (onThrustStart) onThrustStart();
-    if (onThrustEnd) onThrustEnd();
-    if (onRotateLeftStart) onRotateLeftStart();
-    if (onRotateLeftEnd) onRotateLeftEnd();
-    if (onRotateRightStart) onRotateRightStart();
-    if (onRotateRightEnd) onRotateRightEnd();
-    if (onShoot) onShoot();
-    if (onRestartGame) onRestartGame();
-  }, [
-    onThrustStart, onThrustEnd,
-    onRotateLeftStart, onRotateLeftEnd,
-    onRotateRightStart, onRotateRightEnd,
-    onShoot, onRestartGame
-  ]);
 
 
   return (

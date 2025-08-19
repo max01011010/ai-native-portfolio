@@ -11,22 +11,24 @@ const ContactSection: React.FC = () => {
   const [gameIsOver, setGameIsOver] = useState(false);
   const isMobile = useIsMobile(); // Determine if on mobile
 
-  // Callbacks to pass to AsteroidsGame and MobileGameControls
-  const [thrusting, setThrusting] = useState(false);
-  const [rotatingLeft, setRotatingLeft] = useState(false);
-  const [rotatingRight, setRotatingRight] = useState(false);
-  const [shootTrigger, setShootTrigger] = useState(0); // Use a counter to trigger shoot
+  // States for mobile controls
+  const [mobileThrusting, setMobileThrusting] = useState(false);
+  const [mobileRotatingLeft, setMobileRotatingLeft] = useState(false);
+  const [mobileRotatingRight, setMobileRotatingRight] = useState(false);
+  const [mobileShootTrigger, setMobileShootTrigger] = useState(0); // Counter for shoot button presses
+  const [mobileRestartTrigger, setMobileRestartTrigger] = useState(0); // Counter for restart button presses
 
-  const handleThrustStart = useCallback(() => setThrusting(true), []);
-  const handleThrustEnd = useCallback(() => setThrusting(false), []);
-  const handleRotateLeftStart = useCallback(() => setRotatingLeft(true), []);
-  const handleRotateLeftEnd = useCallback(() => setRotatingLeft(false), []);
-  const handleRotateRightStart = useCallback(() => setRotatingRight(true), []);
-  const handleRotateRightEnd = useCallback(() => setRotatingRight(false), []);
-  const handleShoot = useCallback(() => setShootTrigger(prev => prev + 1), []);
+  const handleThrustStart = useCallback(() => setMobileThrusting(true), []);
+  const handleThrustEnd = useCallback(() => setMobileThrusting(false), []);
+  const handleRotateLeftStart = useCallback(() => setMobileRotatingLeft(true), []);
+  const handleRotateLeftEnd = useCallback(() => setMobileRotatingLeft(false), []);
+  const handleRotateRightStart = useCallback(() => setMobileRotatingRight(true), []);
+  const handleRotateRightEnd = useCallback(() => setMobileRotatingRight(false), []);
+  const handleShoot = useCallback(() => setMobileShootTrigger(prev => prev + 1), []);
   const handleRestartGame = useCallback(() => {
-    setGameIsOver(false);
-    setGameScore(0);
+    setGameIsOver(false); // Reset game over state
+    setGameScore(0); // Reset score
+    setMobileRestartTrigger(prev => prev + 1); // Trigger restart in game component
   }, []);
 
   return (
@@ -36,14 +38,11 @@ const ContactSection: React.FC = () => {
         onScoreChange={setGameScore}
         onGameOver={setGameIsOver}
         // Pass mobile control states/triggers to the game
-        onThrustStart={thrusting ? () => {} : undefined} // Only pass if true to avoid constant re-renders
-        onThrustEnd={!thrusting ? () => {} : undefined}
-        onRotateLeftStart={rotatingLeft ? () => {} : undefined}
-        onRotateLeftEnd={!rotatingLeft ? () => {} : undefined}
-        onRotateRightStart={rotatingRight ? () => {} : undefined}
-        onRotateRightEnd={!rotatingRight ? () => {} : undefined}
-        onShoot={shootTrigger > 0 ? () => setShootTrigger(0) : undefined} // Reset trigger after use
-        onRestartGame={gameIsOver ? handleRestartGame : undefined}
+        isThrusting={mobileThrusting}
+        isRotatingLeft={mobileRotatingLeft}
+        isRotatingRight={mobileRotatingRight}
+        shootTrigger={mobileShootTrigger}
+        restartTrigger={mobileRestartTrigger}
       />
 
       {/* Overlay to make text readable over the game */}
