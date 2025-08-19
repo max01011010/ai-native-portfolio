@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useEffect } => {
+import React, { useEffect } from "react";
+
+const CommonNinjaBlogWidget: React.FC = () => {
+  useEffect(() => {
     const scriptId = "commonninja-sdk";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
