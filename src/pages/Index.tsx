@@ -43,29 +43,35 @@ const Index = () => {
     const deltaY = event.deltaY;
 
     // Define a small buffer for detecting scroll edges
-    const scrollEdgeBuffer = 5; 
+    const scrollEdgeBuffer = 5; // Pixels from the edge to consider "at the edge"
 
     // Check if the current section has vertical scrollable content
-    const hasVerticalScroll = scrollHeight > clientHeight + scrollEdgeBuffer;
+    const canScrollVertically = scrollHeight > clientHeight + scrollEdgeBuffer;
 
     let shouldTransitionHorizontally = false;
     let targetSectionIndex = currentSectionIndex;
 
     if (deltaY > 0) { // Scrolling down
-      // If there's no vertical scroll, or if there is and we're at or very near the bottom
-      if (!hasVerticalScroll || (hasVerticalScroll && scrollTop + clientHeight >= scrollHeight - scrollEdgeBuffer)) {
-        if (currentSectionIndex < sections.length - 1) {
-          shouldTransitionHorizontally = true;
-          targetSectionIndex = currentSectionIndex + 1;
-        }
+      if (canScrollVertically && scrollTop + clientHeight < scrollHeight - scrollEdgeBuffer) {
+        // Still content to scroll down vertically, allow default scroll
+        return;
+      }
+      // If we are here, it means we are at the bottom or cannot scroll vertically.
+      // Attempt horizontal transition if possible.
+      if (currentSectionIndex < sections.length - 1) {
+        shouldTransitionHorizontally = true;
+        targetSectionIndex = currentSectionIndex + 1;
       }
     } else if (deltaY < 0) { // Scrolling up
-      // If there's no vertical scroll, or if there is and we're at or very near the top
-      if (!hasVerticalScroll || (hasVerticalScroll && scrollTop <= scrollEdgeBuffer)) {
-        if (currentSectionIndex > 0) {
-          shouldTransitionHorizontally = true;
-          targetSectionIndex = currentSectionIndex - 1;
-        }
+      if (canScrollVertically && scrollTop > scrollEdgeBuffer) {
+        // Still content to scroll up vertically, allow default scroll
+        return;
+      }
+      // If we are here, it means we are at the top or cannot scroll vertically.
+      // Attempt horizontal transition if possible.
+      if (currentSectionIndex > 0) {
+        shouldTransitionHorizontally = true;
+        targetSectionIndex = currentSectionIndex - 1;
       }
     }
 
@@ -107,16 +113,9 @@ const Index = () => {
           }, 700);
         }
       }
-    } else {
-      // If no horizontal transition is attempted, ensure any pending timeout is cleared
-      // and allow normal vertical scrolling.
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-        scrollTimeoutRef.current = null;
-        lastScrollDirectionRef.current = null;
-      }
-      // No preventDefault here, so vertical scrolling is allowed.
     }
+    // If shouldTransitionHorizontally is false, we do NOT call event.preventDefault(),
+    // allowing the browser to handle the natural vertical scroll.
   }, [currentSectionIndex, scrollToSection]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
