@@ -52,7 +52,7 @@ const ProjectsModal: React.FC<ProjectsModalProps> = ({ isOpen, onClose, projects
             >
               <h3 className="text-lg font-semibold mb-1">{app.title}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow">
-                {truncateWords(app.description, 8)}
+                {truncateWords(app.description, 6)}
               </p>
               {app.isComingSoon && (
                 <span className="mt-2 text-gray-500 dark:text-gray-500 text-xs">
