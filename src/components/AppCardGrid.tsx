@@ -63,6 +63,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
     loop: false,
     align: 'center',
     dragFree: true,
+    containScroll: 'trimSnaps', // Added to ensure proper snapping at ends
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,12 +117,12 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
       </div>
       <div className="embla flex-grow overflow-hidden relative z-10"> {/* Ensure carousel is above background */}
         <div className="embla__viewport h-full" ref={emblaRef}>
-          <div className="embla__container flex h-full items-center">
+          <div className="embla__container flex h-full items-center gap-x-6"> {/* Added gap-x-6 for spacing */}
             {appData.map((app, index) => (
-              <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3 py-4 flex justify-center items-center">
+              <div key={app.id} className="embla__slide flex-shrink-0 w-full max-w-sm py-4"> {/* Changed width to max-w-sm and removed px-3, flex justify-center items-center */}
                 <Card
                   className={cn(
-                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] w-full max-w-sm", // Removed max-h, added max-w-sm
+                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] w-full", // Removed max-w-sm here as it's now on the slide
                     index === selectedIndex
                       ? "bg-[#794bc4] text-white" // Highlighted style with Ko-fi color
                       : "bg-white dark:bg-gray-950" // Default style
