@@ -39,7 +39,7 @@ const RssAppBlogWidget = forwardRef<HTMLElement, RssAppBlogWidgetProps>((props, 
     <section ref={ref} id="blog" className="relative py-12 bg-white dark:bg-gray-800 opacity-0 animate-fade-in-up h-full overflow-y-auto flex flex-col justify-center">
       {/* Constellation Background for Blog Section */}
       <ConstellationBackground
-        particleColor="rgba(0, 0, 0, 0.6)" // Darker particles for light background
+        particleColor="#794BC4" // Updated particle color
         lineColor="rgba(0, 0, 0, " // Darker lines
         overlayColor="bg-white" // White overlay
         overlayOpacity={0.2} // Subtle overlay
