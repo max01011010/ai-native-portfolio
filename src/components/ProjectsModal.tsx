@@ -51,7 +51,7 @@ const ProjectsModal: React.FC<ProjectsModalProps> = ({ isOpen, onClose, projects
               disabled={app.isComingSoon}
             >
               <h3 className="text-lg font-semibold mb-1">{app.title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow">
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow overflow-hidden whitespace-nowrap text-ellipsis">
                 {app.description}
               </p>
               {!app.isComingSoon && (
