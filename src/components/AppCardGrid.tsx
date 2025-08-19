@@ -76,6 +76,17 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
     <section id="projects" className="py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 opacity-0 animate-fade-in-up">My Projects</h2>
+        {/* Moved "Load More Projects" button here */}
+        <div className="text-center mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `200ms` }}>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="px-6 py-3 rounded-full font-semibold shadow-lg">
+                Load More Projects
+              </Button>
+            </DialogTrigger>
+            <ProjectsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} projects={appData} />
+          </Dialog>
+        </div>
       </div>
       <div className="embla flex-grow overflow-hidden relative">
         <div className="embla__viewport h-full" ref={emblaRef}>
@@ -84,7 +95,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
               <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3">
                 <Card
                   className="flex flex-col h-[90%] opacity-0 animate-fade-in-up transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-                  style={{ animationDelay: `${index * 100 + 200}ms` }}
+                  style={{ animationDelay: `${index * 100 + 400}ms` }}
                 >
                   <CardHeader>
                     <img src={app.imageUrl} alt={app.title} className="w-full h-48 object-cover rounded-md mb-4" />
@@ -108,16 +119,6 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
             ))}
           </div>
         </div>
-      </div>
-      <div className="text-center mt-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `${appData.length * 100 + 200}ms` }}>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="px-6 py-3 rounded-full font-semibold shadow-lg">
-              Load More Projects
-            </Button>
-          </DialogTrigger>
-          <ProjectsModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} projects={appData} />
-        </Dialog>
       </div>
     </section>
   );
