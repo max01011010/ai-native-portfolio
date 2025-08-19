@@ -108,22 +108,24 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
               <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3">
                 <Card
                   className={cn(
-                    "flex flex-col h-[90%] transition-all duration-300 hover:shadow-xl hover:scale-[1.02]",
+                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] h-full aspect-[3/4]", // Added h-full and aspect-[3/4]
                     index === selectedIndex
                       ? "bg-[#794bc4] text-white" // Highlighted style with Ko-fi color
                       : "bg-white dark:bg-gray-950" // Default style
                   )}
                   style={{ animationDelay: `${index * 100 + 400}ms` }}
                 >
-                  <CardHeader>
-                    <img src={app.imageUrl} alt={app.title} className="w-full h-48 object-cover rounded-md mb-4" />
+                  {/* Image container with aspect ratio */}
+                  <div className="relative w-full aspect-video rounded-t-md overflow-hidden">
+                    <img src={app.imageUrl} alt={app.title} className="absolute inset-0 w-full h-full object-cover" />
+                  </div>
+                  <CardHeader className="pb-2">
                     <CardTitle className={cn(index === selectedIndex ? "text-white" : "text-gray-900 dark:text-gray-100")}>{app.title}</CardTitle>
-                    <CardDescription className={cn(index === selectedIndex ? "text-purple-100" : "text-gray-600 dark:text-gray-400", "flex-grow")}>
-                      {app.description}
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-grow"></CardContent>
-                  <CardFooter>
+                  <CardContent className={cn(index === selectedIndex ? "text-purple-100" : "text-gray-600 dark:text-gray-400", "flex-grow text-sm pb-2")}>
+                    {app.description}
+                  </CardContent>
+                  <CardFooter className="pt-0">
                     <Button asChild className={cn("w-full", index === selectedIndex ? "bg-white text-[#794bc4] hover:bg-gray-100" : "")} disabled={app.isComingSoon}>
                       {app.isComingSoon ? (
                         <span>Coming Soon!</span>
