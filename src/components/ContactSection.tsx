@@ -1,17 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import AsteroidsGame from "./AsteroidsGame"; // Import the new AsteroidsGame component
+import AsteroidsGame from "./AsteroidsGame";
+import MobileGameControls from "./MobileGameControls"; // Import MobileGameControls
+import { useIsMobile } from "@/hooks/use-mobile"; // Import useIsMobile
 
 const ContactSection: React.FC = () => {
   const [gameScore, setGameScore] = useState(0);
   const [gameIsOver, setGameIsOver] = useState(false);
+  const isMobile = useIsMobile(); // Determine if on mobile
+
+  // Callbacks to pass to AsteroidsGame and MobileGameControls
+  const [thrusting, setThrusting] = useState(false);
+  const [rotatingLeft, setRotatingLeft] = useState(false);
+  const [rotatingRight, setRotatingRight] = useState(false);
+  const [shootTrigger, setShootTrigger] = useState(0); // Use a counter to trigger shoot
+
+  const handleThrustStart = useCallback(() => setThrusting(true), []);
+  const handleThrustEnd = useCallback(() => setThrusting(false), []);
+  const handleRotateLeftStart = useCallback(() => setRotatingLeft(true), []);
+  const handleRotateLeftEnd = useCallback(() => setRotatingLeft(false), []);
+  const handleRotateRightStart = useCallback(() => setRotatingRight(true), []);
+  const handleRotateRightEnd = useCallback(() => setRotatingRight(false), []);
+  const handleShoot = useCallback(() => setShootTrigger(prev => prev + 1), []);
+  const handleRestartGame = useCallback(() => {
+    setGameIsOver(false);
+    setGameScore(0);
+  }, []);
 
   return (
     <section className="relative py-12 bg-gradient-to-br from-blue-700 to-purple-800 text-white h-full flex flex-col justify-between items-center overflow-hidden">
       {/* Asteroids game background */}
-      <AsteroidsGame onScoreChange={setGameScore} onGameOver={setGameIsOver} />
+      <AsteroidsGame
+        onScoreChange={setGameScore}
+        onGameOver={setGameIsOver}
+        // Pass mobile control states/triggers to the game
+        onThrustStart={thrusting ? () => {} : undefined} // Only pass if true to avoid constant re-renders
+        onThrustEnd={!thrusting ? () => {} : undefined}
+        onRotateLeftStart={rotatingLeft ? () => {} : undefined}
+        onRotateLeftEnd={!rotatingLeft ? () => {} : undefined}
+        onRotateRightStart={rotatingRight ? () => {} : undefined}
+        onRotateRightEnd={!rotatingRight ? () => {} : undefined}
+        onShoot={shootTrigger > 0 ? () => setShootTrigger(0) : undefined} // Reset trigger after use
+        onRestartGame={gameIsOver ? handleRestartGame : undefined}
+      />
 
       {/* Overlay to make text readable over the game */}
       <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
@@ -46,10 +79,27 @@ const ContactSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Game Instructions - Moved here to be above the footer */}
-      <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
-        <p>"WASD" to move | "Space" to shoot</p>
-      </div>
+      {/* Game Instructions */}
+      {!isMobile && ( // Only show keyboard instructions on non-mobile
+        <div className="text-white text-sm md:text-base font-mono z-20 mt-auto mb-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '700ms' }}>
+          <p>"WASD" to move | "Space" to shoot</p>
+        </div>
+      )}
+
+      {/* Mobile Game Controls */}
+      {isMobile && (
+        <MobileGameControls
+          onThrustStart={handleThrustStart}
+          onThrustEnd={handleThrustEnd}
+          onRotateLeftStart={handleRotateLeftStart}
+          onRotateLeftEnd={handleRotateLeftEnd}
+          onRotateRightStart={handleRotateRightStart}
+          onRotateRightEnd={handleRotateRightEnd}
+          onShoot={handleShoot}
+          isGameOver={gameIsOver}
+          onRestart={handleRestartGame}
+        />
+      )}
 
       <div className="container mx-auto px-4 text-center relative z-20 text-white">
         <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-4">

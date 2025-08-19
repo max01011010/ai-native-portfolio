@@ -42,9 +42,29 @@ interface Asteroid extends GameObject {}
 interface AsteroidsGameProps {
   onScoreChange: (score: number) => void;
   onGameOver: (isOver: boolean) => void;
+  // New props for mobile controls
+  onThrustStart?: () => void;
+  onThrustEnd?: () => void;
+  onRotateLeftStart?: () => void;
+  onRotateLeftEnd?: () => void;
+  onRotateRightStart?: () => void;
+  onRotateRightEnd?: () => void;
+  onShoot?: () => void;
+  onRestartGame?: () => void;
 }
 
-const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver }) => {
+const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
+  onScoreChange,
+  onGameOver,
+  onThrustStart,
+  onThrustEnd,
+  onRotateLeftStart,
+  onRotateLeftEnd,
+  onRotateRightStart,
+  onRotateRightEnd,
+  onShoot,
+  onRestartGame,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const playerRef = useRef<Player>({
@@ -173,6 +193,21 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
     ctx.fill();
   }, []);
 
+  const fireBullet = useCallback(() => {
+    const player = playerRef.current;
+    if (!gameIsOver.current && player.bullets.length < MAX_BULLETS) {
+      player.bullets.push({
+        x: player.x + Math.cos(player.angle - Math.PI / 2) * player.radius,
+        y: player.y + Math.sin(player.angle - Math.PI / 2) * player.radius,
+        vx: player.vx + Math.cos(player.angle - Math.PI / 2) * BULLET_SPEED,
+        vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
+        radius: BULLET_RADIUS,
+        lifespan: BULLET_LIFESPAN,
+        color: "red",
+      });
+    }
+  }, []);
+
   const updateGame = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || gameIsOver.current) return;
@@ -180,7 +215,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
     const player = playerRef.current;
     const asteroids = asteroidsRef.current;
 
-    // Player rotation
+    // Player rotation (from keyboard or touch controls)
     if (player.rotatingLeft) {
       player.angle -= PLAYER_ROTATION_SPEED;
     }
@@ -188,7 +223,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
       player.angle += PLAYER_ROTATION_SPEED;
     }
 
-    // Player thrust
+    // Player thrust (from keyboard or touch controls)
     if (player.thrusting) {
       player.vx += Math.cos(player.angle - Math.PI / 2) * PLAYER_THRUST;
       player.vy += Math.sin(player.angle - Math.PI / 2) * PLAYER_THRUST;
@@ -306,23 +341,12 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
     }
     if (e.code === "Space" && !gameIsOver.current) {
       e.preventDefault(); // Prevent scrolling
-      if (player.bullets.length < MAX_BULLETS) { // Check bullet limit
-        player.bullets.push({
-          x: player.x + Math.cos(player.angle - Math.PI / 2) * player.radius,
-          y: player.y + Math.sin(player.angle - Math.PI / 2) * player.radius,
-          vx: player.vx + Math.cos(player.angle - Math.PI / 2) * BULLET_SPEED,
-          vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
-          radius: BULLET_RADIUS, // Use the new bullet radius
-          lifespan: BULLET_LIFESPAN,
-          color: "red", // Red color for bullets
-        });
-      }
+      fireBullet();
     }
     if (e.code === "KeyR" && gameIsOver.current) {
-      initGame();
-      gameLoop();
+      onRestartGame?.(); // Use optional chaining
     }
-  }, [initGame, gameLoop]);
+  }, [fireBullet, onRestartGame]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     keysPressed.current[e.code] = false;
@@ -338,6 +362,20 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
       player.rotatingRight = false;
     }
   }, []);
+
+  // Callbacks for mobile controls
+  const handleThrustStart = useCallback(() => { playerRef.current.thrusting = true; }, []);
+  const handleThrustEnd = useCallback(() => { playerRef.current.thrusting = false; }, []);
+  const handleRotateLeftStart = useCallback(() => { playerRef.current.rotatingLeft = true; }, []);
+  const handleRotateLeftEnd = useCallback(() => { playerRef.current.rotatingLeft = false; }, []);
+  const handleRotateRightStart = useCallback(() => { playerRef.current.rotatingRight = true; }, []);
+  const handleRotateRightEnd = useCallback(() => { playerRef.current.rotatingRight = false; }, []);
+  const handleShoot = useCallback(() => { fireBullet(); }, [fireBullet]);
+  const handleRestart = useCallback(() => {
+    initGame();
+    gameLoop();
+  }, [initGame, gameLoop]);
+
 
   useEffect(() => {
     initGame();
@@ -366,6 +404,24 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
       window.removeEventListener("resize", handleResize);
     };
   }, [initGame, gameLoop, handleKeyDown, handleKeyUp]);
+
+  // Expose control handlers via props
+  useEffect(() => {
+    if (onThrustStart) onThrustStart();
+    if (onThrustEnd) onThrustEnd();
+    if (onRotateLeftStart) onRotateLeftStart();
+    if (onRotateLeftEnd) onRotateLeftEnd();
+    if (onRotateRightStart) onRotateRightStart();
+    if (onRotateRightEnd) onRotateRightEnd();
+    if (onShoot) onShoot();
+    if (onRestartGame) onRestartGame();
+  }, [
+    onThrustStart, onThrustEnd,
+    onRotateLeftStart, onRotateLeftEnd,
+    onRotateRightStart, onRotateRightEnd,
+    onShoot, onRestartGame
+  ]);
+
 
   return (
     <div className="absolute inset-0 z-0">
