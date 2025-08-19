@@ -8,6 +8,7 @@ import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectsModal from "./ProjectsModal";
 import { cn } from "@/lib/utils";
+import ConstellationBackground from "./ConstellationBackground"; // Import the new component
 
 interface AppCardProps {
   id: string;
@@ -87,8 +88,16 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
   }, [emblaApi, onSelect]);
 
   return (
-    <section id="projects" className="py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center">
-      <div className="container mx-auto px-4">
+    <section id="projects" className="relative py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center overflow-hidden">
+      {/* Constellation Background for Projects Section */}
+      <ConstellationBackground 
+        particleColor="rgba(0, 0, 0, 0.6)" // Darker particles for light background
+        lineColor="rgba(0, 0, 0, " // Darker lines
+        overlayColor="bg-white" // White overlay
+        overlayOpacity={0.2} // Subtle overlay
+      />
+
+      <div className="container mx-auto px-4 relative z-10"> {/* Ensure content is above background */}
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 opacity-0 animate-fade-in-up">My Projects</h2>
         <div className="text-center mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `200ms` }}>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -101,7 +110,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
           </Dialog>
         </div>
       </div>
-      <div className="embla flex-grow overflow-hidden relative">
+      <div className="embla flex-grow overflow-hidden relative z-10"> {/* Ensure carousel is above background */}
         <div className="embla__viewport h-full" ref={emblaRef}>
           <div className="embla__container flex h-full items-center">
             {appData.map((app, index) => (
