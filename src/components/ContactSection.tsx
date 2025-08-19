@@ -18,11 +18,12 @@ const ContactSection: React.FC = () => {
 
       {/* Content of the Contact Section */}
       <div className="container mx-auto px-4 text-center flex flex-col items-center relative z-20 text-white">
-        <h2 className="text-3xl font-bold mb-8 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
+        <h2 className="text-3xl font-bold mb-2 text-gray-100 opacity-0 animate-fade-in-up">Get in Touch</h2>
+        <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          or take a short game break 😉
+        </p>
         <p className="text-lg mb-8 max-w-xl opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           Have a project idea or just want to say hello? Feel free to reach out!
-          <br />
-          <span className="text-sm text-gray-300">(You can play a mini-game while you're here!)</span>
         </p>
         <a
           href="mailto:contact@maxabardo.work"
@@ -35,9 +36,9 @@ const ContactSection: React.FC = () => {
         <div className="mt-4 text-white text-lg font-mono z-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
           {gameIsOver ? (
             <>
-              <h3 className="text-2xl font-bold mb-2">GAME OVER</h3>
               <p className="text-xl mb-2">Final Score: {gameScore}</p>
-              <p className="text-base">Press 'R' to Restart</p>
+              <p className="text-base mb-2">Press 'R' to Restart</p>
+              <h3 className="text-2xl font-bold">GAME OVER</h3>
             </>
           ) : (
             <p>Score: {gameScore}</p>
