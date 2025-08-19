@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, forwardRef, Ref } from "react";
-import ConstellationBackground from "./ConstellationBackground"; // Import the new component
 
 interface CommonNinjaBlogWidgetProps {
   // No specific props needed for now, but keeping the interface for consistency
@@ -50,15 +49,8 @@ const CommonNinjaBlogWidget = forwardRef<HTMLElement, CommonNinjaBlogWidgetProps
   }, []); // Empty dependency array means it runs once on mount
 
   return (
-    <section ref={ref} className="relative py-12 bg-white dark:bg-gray-800 opacity-0 animate-fade-in-up h-full flex flex-col justify-center overflow-hidden">
-      {/* Constellation Background for Blog Section */}
-      <ConstellationBackground
-        particleColor="rgba(121, 75, 196, 0.8)" // #794BC4 with 80% opacity
-        lineColor="rgba(121, 75, 196, " // #794BC4, opacity will be added dynamically
-        overlayColor="bg-white" // White overlay
-        overlayOpacity={0.2} // Subtle overlay
-      />
-      <div className="container mx-auto px-4 relative z-10"> {/* Ensure content is above background */}
+    <section ref={ref} className="py-12 bg-white dark:bg-gray-800 opacity-0 animate-fade-in-up h-full overflow-y-auto">
+      <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100">Latest Blog Posts</h2>
         <div className="commonninja_component pid-faa886a1-7198-4cd7-be01-d0344d766080"></div>
       </div>
