@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react';
-import type { EmblaCarouselType } from 'embla-carousel-react'; // Corrected import
+import type { UseEmblaCarouselType } from 'embla-carousel-react'; // Corrected import
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import ProjectsModal from "./ProjectsModal";
 import { cn } from "@/lib/utils";
@@ -55,7 +55,7 @@ const appData: AppCardProps[] = [
 ];
 
 export interface AppCardGridRef {
-  getEmblaApi: () => EmblaCarouselType | undefined;
+  getEmblaApi: () => UseEmblaCarouselType[1] | undefined; // Corrected type here
 }
 
 const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
@@ -69,7 +69,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0); // State to track selected index
 
   // Update selectedIndex when carousel changes
-  const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+  const onSelect = useCallback((emblaApi: UseEmblaCarouselType[1]) => { // Corrected type here
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, []);
 
