@@ -57,7 +57,7 @@ export interface AppCardGridRef {
 const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
-    align: 'start',
+    align: 'center', // Center the active slide
     dragFree: true,
   });
 
@@ -82,7 +82,7 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
         <div className="embla__viewport h-full" ref={emblaRef}>
           <div className="embla__container flex h-full items-center">
             {appData.map((app, index) => (
-              <div key={app.id} className="embla__slide flex-shrink-0 w-[80vw] sm:w-[45vw] lg:w-[30vw] xl:w-[22vw] px-3">
+              <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3"> {/* Adjusted width for larger cards */}
                 <Card
                   className="flex flex-col h-[90%] opacity-0 animate-fade-in-up transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
                   style={{ animationDelay: `${index * 100 + 200}ms` }}
