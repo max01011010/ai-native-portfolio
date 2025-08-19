@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AsteroidsGame from "./AsteroidsGame"; // Import the new AsteroidsGame component
 
 const ContactSection: React.FC = () => {
+  const [gameScore, setGameScore] = useState(0);
+  const [gameIsOver, setGameIsOver] = useState(false);
+
   return (
-    <section className="relative py-12 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 h-full flex flex-col justify-between items-center overflow-hidden">
+    <section className="relative py-12 bg-gradient-to-br from-blue-700 to-purple-800 text-white h-full flex flex-col justify-between items-center overflow-hidden">
       {/* Asteroids game background */}
-      <AsteroidsGame />
+      <AsteroidsGame onScoreChange={setGameScore} onGameOver={setGameIsOver} />
 
       {/* Overlay to make text readable over the game */}
       <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
@@ -28,6 +31,18 @@ const ContactSection: React.FC = () => {
         >
           Email Me
         </a>
+        {/* Score keeper and Game Over message */}
+        <div className="mt-4 text-white text-lg font-mono z-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
+          {gameIsOver ? (
+            <>
+              <h3 className="text-2xl font-bold mb-2">GAME OVER</h3>
+              <p className="text-xl mb-2">Final Score: {gameScore}</p>
+              <p className="text-base">Press 'R' to Restart</p>
+            </>
+          ) : (
+            <p>Score: {gameScore}</p>
+          )}
+        </div>
       </div>
 
       <div className="container mx-auto px-4 text-center mt-auto relative z-20 text-white">

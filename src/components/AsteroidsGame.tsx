@@ -37,7 +37,12 @@ interface Bullet extends GameObject {
 
 interface Asteroid extends GameObject {}
 
-const AsteroidsGame: React.FC = () => {
+interface AsteroidsGameProps {
+  onScoreChange: (score: number) => void;
+  onGameOver: (isOver: boolean) => void;
+}
+
+const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const playerRef = useRef<Player>({
@@ -51,12 +56,12 @@ const AsteroidsGame: React.FC = () => {
     rotatingLeft: false,
     rotatingRight: false,
     bullets: [],
-    color: "white", // Changed to white
+    color: "#2563eb", // Blue color for the ship
   });
   const asteroidsRef = useRef<Asteroid[]>([]);
   const keysPressed = useRef<{ [key: string]: boolean }>({});
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [score, setScore] = useState(0);
+  const currentScore = useRef(0);
+  const gameIsOver = useRef(false);
 
   const initGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -79,7 +84,7 @@ const AsteroidsGame: React.FC = () => {
       rotatingLeft: false,
       rotatingRight: false,
       bullets: [],
-      color: "white",
+      color: "#2563eb", // Blue color for the ship
     };
 
     asteroidsRef.current = [];
@@ -87,9 +92,11 @@ const AsteroidsGame: React.FC = () => {
       spawnAsteroid(canvas.width, canvas.height);
     }
 
-    setIsGameOver(false);
-    setScore(0);
-  }, []);
+    currentScore.current = 0;
+    onScoreChange(0);
+    gameIsOver.current = false;
+    onGameOver(false);
+  }, [onScoreChange, onGameOver]);
 
   const spawnAsteroid = useCallback((width: number, height: number) => {
     let x, y;
@@ -113,7 +120,7 @@ const AsteroidsGame: React.FC = () => {
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       radius,
-      color: "white", // Changed to white
+      color: "white", // White color for asteroids
     });
   }, []);
 
@@ -164,7 +171,7 @@ const AsteroidsGame: React.FC = () => {
 
   const updateGame = useCallback(() => {
     const canvas = canvasRef.current;
-    if (!canvas || isGameOver) return;
+    if (!canvas || gameIsOver.current) return;
 
     const player = playerRef.current;
     const asteroids = asteroidsRef.current;
@@ -234,7 +241,8 @@ const AsteroidsGame: React.FC = () => {
           // Collision! Remove bullet and asteroid
           player.bullets.splice(i, 1);
           asteroids.splice(j, 1);
-          setScore((prevScore) => prevScore + 10); // Increase score
+          currentScore.current += 10;
+          onScoreChange(currentScore.current); // Notify parent of score change
           // Spawn a new asteroid to replace the destroyed one
           spawnAsteroid(canvas.width, canvas.height);
           break; // Break inner loop as bullet is removed
@@ -248,14 +256,15 @@ const AsteroidsGame: React.FC = () => {
       const dist = Math.sqrt((player.x - asteroid.x)**2 + (player.y - asteroid.y)**2);
       if (dist < player.radius + asteroid.radius) {
         // Game Over!
-        setIsGameOver(true);
+        gameIsOver.current = true;
+        onGameOver(true); // Notify parent of game over
         if (animationFrameId.current) {
           cancelAnimationFrame(animationFrameId.current);
         }
         break;
       }
     }
-  }, [isGameOver, spawnAsteroid]);
+  }, [onScoreChange, onGameOver]);
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
@@ -273,10 +282,10 @@ const AsteroidsGame: React.FC = () => {
     asteroidsRef.current.forEach((asteroid) => drawAsteroid(ctx, asteroid));
     playerRef.current.bullets.forEach((bullet) => drawBullet(ctx, bullet));
 
-    if (!isGameOver) {
+    if (!gameIsOver.current) {
       animationFrameId.current = requestAnimationFrame(gameLoop);
     }
-  }, [updateGame, drawPlayer, drawAsteroid, drawBullet, isGameOver]);
+  }, [updateGame, drawPlayer, drawAsteroid, drawBullet]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     keysPressed.current[e.code] = true;
@@ -291,7 +300,7 @@ const AsteroidsGame: React.FC = () => {
     if (e.code === "ArrowRight" || e.code === "KeyD") {
       player.rotatingRight = true;
     }
-    if (e.code === "Space" && !isGameOver) {
+    if (e.code === "Space" && !gameIsOver.current) {
       e.preventDefault(); // Prevent scrolling
       player.bullets.push({
         x: player.x + Math.cos(player.angle - Math.PI / 2) * player.radius,
@@ -300,14 +309,14 @@ const AsteroidsGame: React.FC = () => {
         vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
         radius: 2,
         lifespan: BULLET_LIFESPAN,
-        color: "white", // Changed to white
+        color: "white", // White color for bullets
       });
     }
-    if (e.code === "KeyR" && isGameOver) {
+    if (e.code === "KeyR" && gameIsOver.current) {
       initGame();
       gameLoop();
     }
-  }, [isGameOver, initGame, gameLoop]);
+  }, [initGame, gameLoop]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     keysPressed.current[e.code] = false;
@@ -355,19 +364,6 @@ const AsteroidsGame: React.FC = () => {
   return (
     <div className="absolute inset-0 z-0">
       <canvas ref={canvasRef} className="w-full h-full bg-transparent"></canvas>
-      {isGameOver && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-75 text-white text-center">
-          <h2 className="text-4xl font-bold mb-4">GAME OVER</h2>
-          <p className="text-2xl mb-6">Score: {score}</p>
-          <p className="text-lg mb-2">Press 'R' to Restart</p>
-          <p className="text-sm text-gray-400">Use Arrow Keys/WASD to move, Space to shoot</p>
-        </div>
-      )}
-      {!isGameOver && (
-        <div className="absolute top-4 left-4 text-white text-lg font-mono z-10">
-          Score: {score}
-        </div>
-      )}
     </div>
   );
 };
