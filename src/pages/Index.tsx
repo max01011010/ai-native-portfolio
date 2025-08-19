@@ -215,16 +215,7 @@ const Index = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-8 right-8 flex flex-col space-y-2 z-50">
-        {currentSectionIndex < sections.length - 1 && (
-          <Button
-            onClick={() => scrollToSection(currentSectionIndex + 1)}
-            className="p-2 rounded-full bg-[#794bc4] hover:bg-[#6a3ea8] text-white"
-            aria-label="Scroll Right"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </Button>
-        )}
+      <div className="absolute bottom-4 right-24 flex flex-row space-x-2 z-50">
         {currentSectionIndex > 0 && (
           <Button
             onClick={() => scrollToSection(currentSectionIndex - 1)}
@@ -232,6 +223,15 @@ const Index = () => {
             aria-label="Scroll Left"
           >
             <ChevronLeft className="h-6 w-6" />
+          </Button>
+        )}
+        {currentSectionIndex < sections.length - 1 && (
+          <Button
+            onClick={() => scrollToSection(currentSectionIndex + 1)}
+            className="p-2 rounded-full bg-[#794bc4] hover:bg-[#6a3ea8] text-white"
+            aria-label="Scroll Right"
+          >
+            <ChevronRight className="h-6 w-6" />
           </Button>
         )}
       </div>
