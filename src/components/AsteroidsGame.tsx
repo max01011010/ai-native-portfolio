@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 
 // Game Constants
-const PLAYER_SIZE = 20;
+const PLAYER_SIZE = 40; // Doubled the player size
 const PLAYER_ROTATION_SPEED = 0.08;
 const PLAYER_THRUST = 0.05;
 const PLAYER_FRICTION = 0.99;
@@ -129,14 +129,16 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
 
-    ctx.strokeStyle = player.color;
+    ctx.fillStyle = player.color; // Fill color for the ship
+    ctx.strokeStyle = "white"; // Outline color
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, -player.radius); // Nose
     ctx.lineTo(-player.radius * 0.75, player.radius); // Bottom-left
     ctx.lineTo(player.radius * 0.75, player.radius); // Bottom-right
     ctx.closePath();
-    ctx.stroke();
+    ctx.fill(); // Fill the shape
+    ctx.stroke(); // Draw the outline
 
     // Draw thrust flame if thrusting
     if (player.thrusting) {
@@ -309,7 +311,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({ onScoreChange, onGameOver
         vy: player.vy + Math.sin(player.angle - Math.PI / 2) * BULLET_SPEED,
         radius: 2,
         lifespan: BULLET_LIFESPAN,
-        color: "white", // White color for bullets
+        color: "red", // Red color for bullets
       });
     }
     if (e.code === "KeyR" && gameIsOver.current) {
