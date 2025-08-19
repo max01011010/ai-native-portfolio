@@ -39,8 +39,8 @@ const ContactSection: React.FC = () => {
         onGameOver={setGameIsOver}
         // Pass mobile control states/triggers to the game
         isThrusting={mobileThrusting}
-        isRotatingLeft={isRotatingLeft}
-        isRotatingRight={isRotatingRight}
+        isRotatingLeft={mobileRotatingLeft}
+        isRotatingRight={mobileRotatingRight}
         shootTrigger={mobileShootTrigger}
         restartTrigger={mobileRestartTrigger}
       />
