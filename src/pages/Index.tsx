@@ -31,40 +31,49 @@ const Index = () => {
   }, []);
 
   const handleScroll = useCallback((event: WheelEvent) => {
+    if (isTransitioningRef.current) {
+      event.preventDefault(); // Prevent any scrolling during horizontal transition
+      return;
+    }
+
     const currentSectionElement = containerRef.current?.children[currentSectionIndex] as HTMLElement;
     if (!currentSectionElement) return;
 
     const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
     const deltaY = event.deltaY;
 
-    // Determine if we are at the vertical edge of the current section
-    const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-    const atTop = scrollTop <= 1;
+    // Define a small buffer for detecting scroll edges
+    const scrollEdgeBuffer = 5; 
 
-    let shouldAttemptHorizontalTransition = false;
+    // Check if the current section has vertical scrollable content
+    const hasVerticalScroll = scrollHeight > clientHeight + scrollEdgeBuffer;
+
+    let shouldTransitionHorizontally = false;
     let targetSectionIndex = currentSectionIndex;
 
     if (deltaY > 0) { // Scrolling down
-      if (atBottom) {
+      // If there's no vertical scroll, or if there is and we're at or very near the bottom
+      if (!hasVerticalScroll || (hasVerticalScroll && scrollTop + clientHeight >= scrollHeight - scrollEdgeBuffer)) {
         if (currentSectionIndex < sections.length - 1) {
-          shouldAttemptHorizontalTransition = true;
+          shouldTransitionHorizontally = true;
           targetSectionIndex = currentSectionIndex + 1;
         }
       }
     } else if (deltaY < 0) { // Scrolling up
-      if (atTop) {
+      // If there's no vertical scroll, or if there is and we're at or very near the top
+      if (!hasVerticalScroll || (hasVerticalScroll && scrollTop <= scrollEdgeBuffer)) {
         if (currentSectionIndex > 0) {
-          shouldAttemptHorizontalTransition = true;
+          shouldTransitionHorizontally = true;
           targetSectionIndex = currentSectionIndex - 1;
         }
       }
     }
 
-    if (shouldAttemptHorizontalTransition) {
+    if (shouldTransitionHorizontally) {
       event.preventDefault(); // Prevent default vertical scroll ONLY if a horizontal transition is intended
 
       const currentDirection = deltaY > 0 ? 'down' : 'up';
-      const shouldApplyDelay = currentSectionIndex === 1 || currentSectionIndex === 2; // Index 1 is Projects, Index 2 is Blog
+      const shouldApplyDelay = currentSectionIndex === 1 || currentSectionIndex === 2; // Projects and Blog sections
 
       if (shouldApplyDelay) {
         if (scrollTimeoutRef.current && lastScrollDirectionRef.current === currentDirection) {
