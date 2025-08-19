@@ -90,6 +90,9 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
 
   return (
     <section id="projects" className="relative py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center overflow-hidden">
+      {/* Gradient Overlay for smooth transition from Hero section */}
+      <div className="absolute inset-0 z-[5] bg-gradient-to-r from-purple-800/50 to-transparent"></div>
+
       {/* Constellation Background for Projects Section */}
       <ConstellationBackground 
         particleColor="rgba(0, 0, 0, 0.6)" // Darker particles for light background
