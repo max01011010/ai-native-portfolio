@@ -1,21 +1,25 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
-const CommonNinjaBlogWidget: React.FC = () => {
+const CommonNinjaBlogWidget: React.FC<{ isActive: boolean }> = ({ isActive }) => {
+  const scriptLoaded = useRef(false);
+
   useEffect(() => {
     const scriptId = "commonninja-sdk";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
     const initializeWidget = () => {
-      // Check if CommonNinja global object exists and has an init/refresh method
-      if (window.CommonNinja && typeof window.CommonNinja.init === 'function') {
-        window.CommonNinja.init(); // Or CommonNinja.refresh() if init is only for first load
-      } else if (window.CommonNinja && typeof window.CommonNinja.refresh === 'function') {
-        window.CommonNinja.refresh();
+      if (window.CommonNinja) {
+        // Give the DOM a moment to ensure the widget container is fully rendered and visible
+        setTimeout(() => {
+          if (window.CommonNinja && typeof window.CommonNinja.init === 'function') {
+            window.CommonNinja.init();
+          } else if (window.CommonNinja && typeof window.CommonNinja.refresh === 'function') {
+            window.CommonNinja.refresh();
+          }
+        }, 100); // Small delay to ensure DOM is ready
       }
-      // Fallback: if no specific init/refresh, assume it auto-detects the div
-      // and simply ensure the div is present.
     };
 
     if (!script) {
@@ -23,12 +27,18 @@ const CommonNinjaBlogWidget: React.FC = () => {
       script.src = "https://cdn.commoninja.com/sdk/latest/commonninja.js";
       script.defer = true;
       script.id = scriptId;
-      script.onload = initializeWidget; // Initialize once script is loaded
+      script.onload = () => {
+        scriptLoaded.current = true;
+        if (isActive) { // Only initialize if this section is active
+          initializeWidget();
+        }
+      };
       document.body.appendChild(script);
     } else {
-      // If script already exists (e.g., during hot reload or component re-mount),
-      // try to initialize the widget immediately.
-      initializeWidget();
+      scriptLoaded.current = true; // Script is already in DOM
+      if (isActive) { // If already active, try to initialize
+        initializeWidget();
+      }
     }
 
     // Add type definition for CommonNinja to window object
@@ -37,12 +47,30 @@ const CommonNinjaBlogWidget: React.FC = () => {
         CommonNinja?: {
           init?: () => void;
           refresh?: () => void;
-          // Add other methods if known
         };
       }
     }
 
-  }, []); // Empty dependency array means it runs once on mount
+  }, []); // Run once on mount to load script
+
+  useEffect(() => {
+    // This effect runs when isActive changes
+    if (isActive && scriptLoaded.current) {
+      // If this section becomes active and script is loaded, initialize
+      const initializeWidget = () => {
+        if (window.CommonNinja) {
+          setTimeout(() => {
+            if (window.CommonNinja && typeof window.CommonNinja.init === 'function') {
+              window.CommonNinja.init();
+            } else if (window.CommonNinja && typeof window.CommonNinja.refresh === 'function') {
+              window.CommonNinja.refresh();
+            }
+          }, 100);
+        }
+      };
+      initializeWidget();
+    }
+  }, [isActive]); // Re-run when isActive changes
 
   return (
     <section className="py-12 bg-white dark:bg-gray-800 opacity-0 animate-fade-in-up h-full overflow-y-auto">
