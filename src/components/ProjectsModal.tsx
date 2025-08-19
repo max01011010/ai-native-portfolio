@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { truncateWords } from "@/lib/utils"; // Import the new utility function
 
 // Re-defining AppCardProps for self-containment in this component
 interface AppCardProps {
@@ -51,8 +52,8 @@ const ProjectsModal: React.FC<ProjectsModalProps> = ({ isOpen, onClose, projects
               disabled={app.isComingSoon}
             >
               <h3 className="text-lg font-semibold mb-1">{app.title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow line-clamp-2">
-                {app.description}
+              <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow">
+                {truncateWords(app.description, 5)}
               </p>
               {!app.isComingSoon && (
                 <span className="mt-2 text-blue-600 dark:text-blue-400 flex items-center text-xs">
