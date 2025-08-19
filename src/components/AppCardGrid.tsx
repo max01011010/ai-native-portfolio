@@ -105,10 +105,10 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
         <div className="embla__viewport h-full" ref={emblaRef}>
           <div className="embla__container flex h-full items-center">
             {appData.map((app, index) => (
-              <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3 flex justify-center items-center">
+              <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3 py-4 flex justify-center items-center">
                 <Card
                   className={cn(
-                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] max-h-[80vh] w-full", // Adjusted sizing
+                    "flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-[1.02] aspect-[3/4] w-full max-w-sm", // Removed max-h, added max-w-sm
                     index === selectedIndex
                       ? "bg-[#794bc4] text-white" // Highlighted style with Ko-fi color
                       : "bg-white dark:bg-gray-950" // Default style
