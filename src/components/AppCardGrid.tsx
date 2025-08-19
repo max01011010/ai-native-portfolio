@@ -1,12 +1,13 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import useEmblaCarousel, { EmblaCarouselType } from 'embla-carousel-react';
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"; // Import Dialog and DialogTrigger
-import ProjectsModal from "./ProjectsModal"; // Import the new ProjectsModal
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import ProjectsModal from "./ProjectsModal";
+import { cn } from "@/lib/utils";
 
 interface AppCardProps {
   id: string;
@@ -63,6 +64,12 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0); // State to track selected index
+
+  // Update selectedIndex when carousel changes
+  const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, []);
 
   useImperativeHandle(ref, () => ({
     getEmblaApi: () => emblaApi,
@@ -70,13 +77,19 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
 
   useEffect(() => {
     if (!emblaApi) return;
-  }, [emblaApi]);
+    onSelect(emblaApi); // Set initial selected index
+    emblaApi.on('select', onSelect); // Listen for select events
+    emblaApi.on('reInit', onSelect); // Listen for reInit events (e.g., on resize)
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <section id="projects" className="py-12 bg-gray-50 dark:bg-gray-900 h-full flex flex-col justify-center">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-100 opacity-0 animate-fade-in-up">My Projects</h2>
-        {/* Moved "Load More Projects" button here */}
         <div className="text-center mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: `200ms` }}>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
@@ -94,17 +107,24 @@ const AppCardGrid = forwardRef<AppCardGridRef, {}>((props, ref) => {
             {appData.map((app, index) => (
               <div key={app.id} className="embla__slide flex-shrink-0 w-[90vw] md:w-[70vw] lg:w-[50vw] px-3">
                 <Card
-                  className="flex flex-col h-[90%] opacity-0 animate-fade-in-up transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+                  className={cn(
+                    "flex flex-col h-[90%] transition-all duration-300 hover:shadow-xl hover:scale-[1.02]",
+                    index === selectedIndex
+                      ? "bg-purple-600 text-white" // Highlighted style
+                      : "bg-white dark:bg-gray-950" // Default style
+                  )}
                   style={{ animationDelay: `${index * 100 + 400}ms` }}
                 >
                   <CardHeader>
                     <img src={app.imageUrl} alt={app.title} className="w-full h-48 object-cover rounded-md mb-4" />
-                    <CardTitle>{app.title}</CardTitle>
-                    <CardDescription>{app.description}</CardDescription>
+                    <CardTitle className={cn(index === selectedIndex ? "text-white" : "text-gray-900 dark:text-gray-100")}>{app.title}</CardTitle>
+                    <CardDescription className={cn(index === selectedIndex ? "text-purple-100" : "text-gray-600 dark:text-gray-400", "flex-grow")}>
+                      {app.description}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-grow"></CardContent>
                   <CardFooter>
-                    <Button asChild className="w-full" disabled={app.isComingSoon}>
+                    <Button asChild className={cn("w-full", index === selectedIndex ? "bg-white text-purple-600 hover:bg-gray-100" : "")} disabled={app.isComingSoon}>
                       {app.isComingSoon ? (
                         <span>Coming Soon!</span>
                       ) : (
