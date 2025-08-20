@@ -81,6 +81,24 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
   const lastShootTrigger = useRef(0); // To detect changes in shootTrigger prop
   const lastRestartTrigger = useRef(0); // To detect changes in restartTrigger prop
 
+  // Refs for mobile control props to ensure updateGame is stable
+  const isThrustingRef = useRef(isThrusting);
+  const isRotatingLeftRef = useRef(isRotatingLeft);
+  const isRotatingRightRef = useRef(isRotatingRight);
+
+  // Update refs whenever props change
+  useEffect(() => {
+    isThrustingRef.current = isThrusting;
+  }, [isThrusting]);
+
+  useEffect(() => {
+    isRotatingLeftRef.current = isRotatingLeft;
+  }, [isRotatingLeft]);
+
+  useEffect(() => {
+    isRotatingRightRef.current = isRotatingRight;
+  }, [isRotatingRight]);
+
 
   const initGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -115,7 +133,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
     onScoreChange(0);
     gameIsOver.current = false;
     onGameOver(false);
-  }, [onScoreChange, onGameOver]);
+  }, [onScoreChange, onGameOver, spawnAsteroid]); // Added spawnAsteroid to dependencies
 
   const spawnAsteroid = useCallback((width: number, height: number) => {
     let x, y;
@@ -213,9 +231,9 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
     const asteroids = asteroidsRef.current;
 
     // Combine keyboard and mobile inputs for player controls
-    player.thrusting = (keysPressed.current["ArrowUp"] || keysPressed.current["KeyW"]) || isThrusting;
-    player.rotatingLeft = (keysPressed.current["ArrowLeft"] || keysPressed.current["KeyA"]) || isRotatingLeft;
-    player.rotatingRight = (keysPressed.current["ArrowRight"] || keysPressed.current["KeyD"]) || isRotatingRight;
+    player.thrusting = (keysPressed.current["ArrowUp"] || keysPressed.current["KeyW"]) || isThrustingRef.current;
+    player.rotatingLeft = (keysPressed.current["ArrowLeft"] || keysPressed.current["KeyA"]) || isRotatingLeftRef.current;
+    player.rotatingRight = (keysPressed.current["ArrowRight"] || keysPressed.current["KeyD"]) || isRotatingRightRef.current;
 
     // Player rotation
     if (player.rotatingLeft) {
@@ -305,7 +323,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
         break;
       }
     }
-  }, [isThrusting, isRotatingLeft, isRotatingRight, onScoreChange, onGameOver]); // Add new props to dependencies
+  }, [onScoreChange, onGameOver, spawnAsteroid]); // Dependencies for updateGame are now stable
 
   const gameLoop = useCallback(() => {
     const canvas = canvasRef.current;
