@@ -99,6 +99,32 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
     isRotatingRightRef.current = isRotatingRight;
   }, [isRotatingRight]);
 
+  // Moved spawnAsteroid definition before initGame
+  const spawnAsteroid = useCallback((width: number, height: number) => {
+    let x, y;
+    // Spawn asteroid outside a safe zone around the player
+    const safeZoneRadius = Math.max(width, height) / 4;
+    const playerX = playerRef.current.x;
+    const playerY = playerRef.current.y;
+
+    do {
+      x = Math.random() * width;
+      y = Math.random() * height;
+    } while (Math.sqrt((x - playerX)**2 + (y - playerY)**2) < safeZoneRadius);
+
+    const radius = Math.random() * (ASTEROID_SIZE_MAX - ASTEROID_SIZE_MIN) + ASTEROID_SIZE_MIN;
+    const angle = Math.random() * Math.PI * 2;
+    const speed = ASTEROID_SPEED + Math.random() * 0.5; // Slightly varied speed
+
+    asteroidsRef.current.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      radius,
+      color: "white", // White color for asteroids
+    });
+  }, []); // No dependencies needed here as playerRef.current is accessed directly
 
   const initGame = useCallback(() => {
     const canvas = canvasRef.current;
@@ -133,33 +159,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
     onScoreChange(0);
     gameIsOver.current = false;
     onGameOver(false);
-  }, [onScoreChange, onGameOver, spawnAsteroid]); // Added spawnAsteroid to dependencies
-
-  const spawnAsteroid = useCallback((width: number, height: number) => {
-    let x, y;
-    // Spawn asteroid outside a safe zone around the player
-    const safeZoneRadius = Math.max(width, height) / 4;
-    const playerX = playerRef.current.x;
-    const playerY = playerRef.current.y;
-
-    do {
-      x = Math.random() * width;
-      y = Math.random() * height;
-    } while (Math.sqrt((x - playerX)**2 + (y - playerY)**2) < safeZoneRadius);
-
-    const radius = Math.random() * (ASTEROID_SIZE_MAX - ASTEROID_SIZE_MIN) + ASTEROID_SIZE_MIN;
-    const angle = Math.random() * Math.PI * 2;
-    const speed = ASTEROID_SPEED + Math.random() * 0.5; // Slightly varied speed
-
-    asteroidsRef.current.push({
-      x,
-      y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      radius,
-      color: "white", // White color for asteroids
-    });
-  }, []);
+  }, [onScoreChange, onGameOver, spawnAsteroid]); // spawnAsteroid is now correctly in scope
 
   const drawPlayer = useCallback((ctx: CanvasRenderingContext2D, player: Player) => {
     ctx.save();
