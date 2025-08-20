@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
 import AppCardGrid, { AppCardGridRef } from "@/components/AppCardGrid";
 import RssAppBlogWidget from "@/components/RssAppBlogWidget";
 import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile"; // Import useIsMobile
 
 type SectionComponent = React.ComponentType<any> & {
   ref?: React.Ref<any>;
@@ -27,7 +28,11 @@ const Index = () => {
   const blogSectionRef = useRef<HTMLElement>(null);
   const isThrottled = useRef(false);
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const isMobile = useIsMobile(); // Determine if on mobile
+
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   // Ref to hold the latest currentSectionIndex for stable callbacks
   const currentSectionIndexRef = useRef(currentSectionIndex);
@@ -43,7 +48,7 @@ const Index = () => {
       // Use navigate to update the URL hash, ensuring React Router tracks it
       navigate(`#${sections[index].id}`, { replace: true });
     }
-  }, [navigate]); // navigate is a stable function from React Router v6
+  }, [navigate]);
 
   // Effect to synchronize currentSectionIndex with URL hash
   useEffect(() => {
@@ -57,7 +62,7 @@ const Index = () => {
       // If hash is empty (e.g., navigating to base URL), go to hero section
       scrollToSection(0);
     }
-  }, [location.hash, scrollToSection]); // Removed currentSectionIndex from dependencies
+  }, [location.hash, scrollToSection]);
 
   const handleScroll = useCallback((event: WheelEvent) => {
     if (isThrottled.current) return;
@@ -140,7 +145,7 @@ const Index = () => {
         isThrottled.current = false;
       }, 800); // Throttle for 800ms to prevent rapid scrolling
     }
-  }, [scrollToSection]); // Dependencies are stable
+  }, [scrollToSection]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (isThrottled.current) return;
@@ -209,17 +214,74 @@ const Index = () => {
         isThrottled.current = false;
       }, 800);
     }
-  }, [scrollToSection]); // Dependencies are stable
+  }, [scrollToSection]);
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = e.touches[0].clientX; // Initialize touchEndX
+  }, []);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX; // Update touchEndX as finger moves
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (isThrottled.current) return;
+
+    const swipeThreshold = 50; // Minimum swipe distance to trigger navigation
+    const deltaX = touchEndX.current - touchStartX.current;
+
+    if (Math.abs(deltaX) > swipeThreshold) {
+      const latestIndex = currentSectionIndexRef.current;
+      let newIndex = latestIndex;
+      let shouldNavigate = false;
+
+      if (deltaX < 0) { // Swiped left (move to next section)
+        if (latestIndex < sections.length - 1) {
+          newIndex = latestIndex + 1;
+          shouldNavigate = true;
+        }
+      } else { // Swiped right (move to previous section)
+        if (latestIndex > 0) {
+          newIndex = latestIndex - 1;
+          shouldNavigate = true;
+        }
+      }
+
+      if (shouldNavigate && newIndex !== latestIndex) {
+        scrollToSection(newIndex);
+        isThrottled.current = true;
+        setTimeout(() => {
+          isThrottled.current = false;
+        }, 800); // Throttle for 800ms
+      }
+    }
+    // Reset touch coordinates for the next swipe
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  }, [scrollToSection]);
 
   useEffect(() => {
     window.addEventListener("wheel", handleScroll, { passive: false });
     window.addEventListener("keydown", handleKeyDown);
 
+    const containerElement = containerRef.current;
+    if (isMobile && containerElement) {
+      containerElement.addEventListener("touchstart", handleTouchStart);
+      containerElement.addEventListener("touchmove", handleTouchMove);
+      containerElement.addEventListener("touchend", handleTouchEnd);
+    }
+
     return () => {
       window.removeEventListener("wheel", handleScroll);
       window.removeEventListener("keydown", handleKeyDown);
+      if (isMobile && containerElement) {
+        containerElement.removeEventListener("touchstart", handleTouchStart);
+        containerElement.removeEventListener("touchmove", handleTouchMove);
+        containerElement.removeEventListener("touchend", handleTouchEnd);
+      }
     };
-  }, [handleScroll, handleKeyDown]);
+  }, [handleScroll, handleKeyDown, handleTouchStart, handleTouchMove, handleTouchEnd, isMobile]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
