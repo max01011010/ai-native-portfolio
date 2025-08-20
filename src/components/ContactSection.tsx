@@ -67,7 +67,7 @@ const ContactSection: React.FC = () => {
           {gameIsOver ? (
             <>
               <p className="text-xl mb-2">Final Score: {gameScore}</p>
-              <p className="text-base mb-2">Press 'R' to Restart</p>
+              {!isMobile && <p className="text-base mb-2">Press 'R' to Restart</p>} {/* Conditionally render */}
               <h3 className="text-2xl font-bold">Oops, break over!</h3>
             </>
           ) : (
