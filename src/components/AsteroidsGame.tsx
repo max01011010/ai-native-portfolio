@@ -374,8 +374,7 @@ const AsteroidsGame: React.FC<AsteroidsGameProps> = ({
       if (canvas && canvas.parentElement) {
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
-        // Re-initialize game on resize to adjust positions
-        initGame();
+        // Removed initGame() call here to prevent game reset on resize
       }
     };
     window.addEventListener("resize", handleResize);

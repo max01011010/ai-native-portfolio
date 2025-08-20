@@ -95,6 +95,7 @@ const ContactSection: React.FC = () => {
           onShoot={handleShoot}
           isGameOver={gameIsOver}
           onRestart={handleRestartGame}
+          className="bottom-32" // Apply the bottom class here
         />
       )}
 

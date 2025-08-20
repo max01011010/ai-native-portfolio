@@ -15,6 +15,7 @@ interface MobileGameControlsProps {
   onShoot: () => void;
   isGameOver: boolean;
   onRestart: () => void;
+  className?: string; // Add className prop
 }
 
 const MobileGameControls: React.FC<MobileGameControlsProps> = ({
@@ -27,10 +28,11 @@ const MobileGameControls: React.FC<MobileGameControlsProps> = ({
   onShoot,
   isGameOver,
   onRestart,
+  className, // Destructure className
 }) => {
   if (isGameOver) {
     return (
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center space-y-2">
+      <div className={cn("absolute left-1/2 -translate-x-1/2 z-30 flex flex-col items-center space-y-2", className)}>
         <Button
           onClick={onRestart}
           className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-lg"
@@ -42,7 +44,7 @@ const MobileGameControls: React.FC<MobileGameControlsProps> = ({
   }
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 z-30 flex justify-between items-end">
+    <div className={cn("absolute left-4 right-4 z-30 flex justify-between items-end", className)}>
       {/* Left Controls (Rotation) */}
       <div className="flex flex-col space-y-2">
         <Button
