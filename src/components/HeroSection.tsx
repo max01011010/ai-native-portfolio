@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import ConstellationBackground from "./ConstellationBackground"; // Import the new component
+import { Link } from "react-router-dom"; // Import Link
 
 const HeroSection: React.FC = () => {
   return (
@@ -22,14 +23,14 @@ const HeroSection: React.FC = () => {
         </p>
         <div className="flex justify-center space-x-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Button asChild className="px-6 py-3 bg-white text-blue-700 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg">
-            <a href="#projects">
+            <Link to="#projects"> {/* Changed to Link */}
               View Projects
-            </a>
+            </Link>
           </Button>
           <Button asChild className="px-6 py-3 bg-white text-blue-700 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg">
-            <a href="#blog">
+            <Link to="#blog"> {/* Changed to Link */}
               Read Blog
-            </a>
+            </Link>
           </Button>
         </div>
       </div>

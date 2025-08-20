@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom"; // Import useLocation
 import HeroSection from "@/components/HeroSection";
 import AppCardGrid, { AppCardGridRef } from "@/components/AppCardGrid";
-import RssAppBlogWidget from "@/components/RssAppBlogWidget"; // Import RssAppBlogWidget
+import RssAppBlogWidget from "@/components/RssAppBlogWidget";
 import ContactSection from "@/components/ContactSection";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react"; // Import ChevronLeft and ChevronRight
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Define a type that allows components to accept a ref
 type SectionComponent = React.ComponentType<any> & {
   ref?: React.Ref<any>;
 };
@@ -16,7 +16,7 @@ type SectionComponent = React.ComponentType<any> & {
 const sections: { id: string; component: SectionComponent }[] = [
   { id: "hero", component: HeroSection },
   { id: "projects", component: AppCardGrid },
-  { id: "blog", component: RssAppBlogWidget }, // Use RssAppBlogWidget here
+  { id: "blog", component: RssAppBlogWidget },
   { id: "contact", component: ContactSection },
 ];
 
@@ -24,8 +24,9 @@ const Index = () => {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const appCardGridRef = useRef<AppCardGridRef>(null);
-  const blogSectionRef = useRef<HTMLElement>(null); // Ref for the blog section
+  const blogSectionRef = useRef<HTMLElement>(null);
   const isThrottled = useRef(false);
+  const location = useLocation(); // Initialize useLocation
 
   const scrollToSection = useCallback((index: number) => {
     if (containerRef.current) {
@@ -34,6 +35,17 @@ const Index = () => {
       setCurrentSectionIndex(index);
     }
   }, []);
+
+  // Effect to synchronize currentSectionIndex with URL hash
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash) {
+      const sectionIndex = sections.findIndex(section => section.id === hash);
+      if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
+        scrollToSection(sectionIndex);
+      }
+    }
+  }, [location.hash, currentSectionIndex, scrollToSection]);
 
   const handleScroll = useCallback((event: WheelEvent) => {
     if (isThrottled.current) return;
