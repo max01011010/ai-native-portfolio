@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom"; // Import useLocation
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 import HeroSection from "@/components/HeroSection";
 import AppCardGrid, { AppCardGridRef } from "@/components/AppCardGrid";
 import RssAppBlogWidget from "@/components/RssAppBlogWidget";
@@ -26,32 +26,45 @@ const Index = () => {
   const appCardGridRef = useRef<AppCardGridRef>(null);
   const blogSectionRef = useRef<HTMLElement>(null);
   const isThrottled = useRef(false);
-  const location = useLocation(); // Initialize useLocation
+  const location = useLocation();
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  // Ref to hold the latest currentSectionIndex for stable callbacks
+  const currentSectionIndexRef = useRef(currentSectionIndex);
+  useEffect(() => {
+    currentSectionIndexRef.current = currentSectionIndex;
+  }, [currentSectionIndex]);
 
   const scrollToSection = useCallback((index: number) => {
     if (containerRef.current) {
       const newTransform = `translateX(-${index * 100}vw)`;
       containerRef.current.style.transform = newTransform;
       setCurrentSectionIndex(index);
+      // Use navigate to update the URL hash, ensuring React Router tracks it
+      navigate(`#${sections[index].id}`, { replace: true });
     }
-  }, []);
+  }, [navigate]); // navigate is a stable function from React Router v6
 
   // Effect to synchronize currentSectionIndex with URL hash
   useEffect(() => {
     const hash = location.hash.replace("#", "");
-    if (hash) {
-      const sectionIndex = sections.findIndex(section => section.id === hash);
-      if (sectionIndex !== -1 && sectionIndex !== currentSectionIndex) {
-        scrollToSection(sectionIndex);
-      }
+    const sectionIndex = sections.findIndex(section => section.id === hash);
+
+    if (hash && sectionIndex !== -1 && sectionIndex !== currentSectionIndexRef.current) {
+      // Only update if hash exists, section is found, and it's different from current state
+      scrollToSection(sectionIndex);
+    } else if (!hash && currentSectionIndexRef.current !== 0) {
+      // If hash is empty (e.g., navigating to base URL), go to hero section
+      scrollToSection(0);
     }
-  }, [location.hash, currentSectionIndex, scrollToSection]);
+  }, [location.hash, scrollToSection]); // Removed currentSectionIndex from dependencies
 
   const handleScroll = useCallback((event: WheelEvent) => {
     if (isThrottled.current) return;
 
-    const currentSectionId = sections[currentSectionIndex].id;
-    let newIndex = currentSectionIndex;
+    const latestIndex = currentSectionIndexRef.current;
+    const currentSectionId = sections[latestIndex].id;
+    let newIndex = latestIndex;
     let shouldPreventDefault = false;
 
     if (currentSectionId === "projects" && appCardGridRef.current) {
@@ -62,7 +75,7 @@ const Index = () => {
             carouselApi.scrollNext();
             shouldPreventDefault = true;
           } else {
-            newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+            newIndex = Math.min(sections.length - 1, latestIndex + 1);
             shouldPreventDefault = true;
           }
         } else if (event.deltaY < 0) { // Scrolling up
@@ -70,7 +83,7 @@ const Index = () => {
             carouselApi.scrollPrev();
             shouldPreventDefault = true;
           } else {
-            newIndex = Math.max(0, currentSectionIndex - 1);
+            newIndex = Math.max(0, latestIndex - 1);
             shouldPreventDefault = true;
           }
         }
@@ -79,14 +92,14 @@ const Index = () => {
       const { scrollTop, scrollHeight, clientHeight } = blogSectionRef.current;
       if (event.deltaY > 0) { // Scrolling down
         if (scrollTop + clientHeight >= scrollHeight) {
-          newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+          newIndex = Math.min(sections.length - 1, latestIndex + 1);
           shouldPreventDefault = true;
         } else {
           shouldPreventDefault = false; // Allow internal scroll
         }
       } else if (event.deltaY < 0) { // Scrolling up
         if (scrollTop === 0) {
-          newIndex = Math.max(0, currentSectionIndex - 1);
+          newIndex = Math.max(0, latestIndex - 1);
           shouldPreventDefault = true;
         } else {
           shouldPreventDefault = false; // Allow internal scroll
@@ -94,21 +107,21 @@ const Index = () => {
       }
     } else {
       // Standard vertical scroll handling for other sections (Hero, Contact)
-      const currentSectionElement = containerRef.current?.children[currentSectionIndex] as HTMLElement;
+      const currentSectionElement = containerRef.current?.children[latestIndex] as HTMLElement;
       if (!currentSectionElement) return;
 
       const { scrollTop, scrollHeight, clientHeight } = currentSectionElement;
 
       if (event.deltaY > 0) { // Scrolling down
         if (scrollTop + clientHeight >= scrollHeight) {
-          newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+          newIndex = Math.min(sections.length - 1, latestIndex + 1);
           shouldPreventDefault = true;
         } else {
           shouldPreventDefault = false;
         }
       } else if (event.deltaY < 0) { // Scrolling up
         if (scrollTop === 0) {
-          newIndex = Math.max(0, currentSectionIndex - 1);
+          newIndex = Math.max(0, latestIndex - 1);
           shouldPreventDefault = true;
         } else {
           shouldPreventDefault = false;
@@ -120,21 +133,22 @@ const Index = () => {
       event.preventDefault();
     }
 
-    if (newIndex !== currentSectionIndex) {
+    if (newIndex !== latestIndex) {
       scrollToSection(newIndex);
       isThrottled.current = true;
       setTimeout(() => {
         isThrottled.current = false;
       }, 800); // Throttle for 800ms to prevent rapid scrolling
     }
-  }, [currentSectionIndex, scrollToSection]);
+  }, [scrollToSection]); // Dependencies are stable
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (isThrottled.current) return;
 
-    let newIndex = currentSectionIndex;
+    const latestIndex = currentSectionIndexRef.current;
+    let newIndex = latestIndex;
     let handled = false;
-    const currentSectionId = sections[currentSectionIndex].id;
+    const currentSectionId = sections[latestIndex].id;
 
     if (currentSectionId === "projects" && appCardGridRef.current) {
       const carouselApi = appCardGridRef.current.getEmblaApi();
@@ -144,7 +158,7 @@ const Index = () => {
             carouselApi.scrollNext();
             handled = true;
           } else {
-            newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+            newIndex = Math.min(sections.length - 1, latestIndex + 1);
             handled = true;
           }
         } else if (event.key === "ArrowLeft" || event.key === "ArrowUp" || event.key === "PageUp") {
@@ -152,7 +166,7 @@ const Index = () => {
             carouselApi.scrollPrev();
             handled = true;
           } else {
-            newIndex = Math.max(0, currentSectionIndex - 1);
+            newIndex = Math.max(0, latestIndex - 1);
             handled = true;
           }
         }
@@ -161,14 +175,14 @@ const Index = () => {
       const { scrollTop, scrollHeight, clientHeight } = blogSectionRef.current;
       if (event.key === "ArrowDown" || event.key === "PageDown") {
         if (scrollTop + clientHeight >= scrollHeight) {
-          newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+          newIndex = Math.min(sections.length - 1, latestIndex + 1);
           handled = true;
         } else {
           // Allow internal scroll
         }
       } else if (event.key === "ArrowUp" || event.key === "PageUp") {
         if (scrollTop === 0) {
-          newIndex = Math.max(0, currentSectionIndex - 1);
+          newIndex = Math.max(0, latestIndex - 1);
           handled = true;
         } else {
           // Allow internal scroll
@@ -177,17 +191,17 @@ const Index = () => {
     } else {
       // Standard section transition for other sections
       if (event.key === "ArrowDown" || event.key === "PageDown") {
-        newIndex = Math.min(sections.length - 1, currentSectionIndex + 1);
+        newIndex = Math.min(sections.length - 1, latestIndex + 1);
         handled = true;
       } else if (event.key === "ArrowUp" || event.key === "PageUp") {
-        newIndex = Math.max(0, currentSectionIndex - 1);
+        newIndex = Math.max(0, latestIndex - 1);
         handled = true;
       }
     }
 
     if (handled) {
       event.preventDefault();
-      if (newIndex !== currentSectionIndex) {
+      if (newIndex !== latestIndex) {
         scrollToSection(newIndex);
       }
       isThrottled.current = true;
@@ -195,7 +209,7 @@ const Index = () => {
         isThrottled.current = false;
       }, 800);
     }
-  }, [currentSectionIndex, scrollToSection]);
+  }, [scrollToSection]); // Dependencies are stable
 
   useEffect(() => {
     window.addEventListener("wheel", handleScroll, { passive: false });
