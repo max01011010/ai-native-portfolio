@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import AsteroidsGame from "./AsteroidsGame";
 import MobileGameControls from "./MobileGameControls"; // Import MobileGameControls
